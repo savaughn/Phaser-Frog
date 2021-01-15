@@ -29,7 +29,6 @@ export default class Hero extends Phaser.GameObjects.Sprite {
     }
 
     update(time, delta) {
-        console.log(this.body.x, this.body.y);
         if (this.body.onFloor()) {
             // Landing from jump
             if (this.anims.currentAnim.key === 'jump-down') {
