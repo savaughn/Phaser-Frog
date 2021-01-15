@@ -15,8 +15,9 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.armed = false;
         this.lock = false;
         this.jumpForce = 1;
-        this.jumpLock = false;
-        this.canDoubleJump = true;
+        this.canJump = false;
+        this.canDoubleJump = false;
+        this.hasJumped = false;
 
         this.keys = {
             jump: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP),
@@ -53,28 +54,23 @@ export default class Hero extends Phaser.GameObjects.Sprite {
                 this.anims.play('idle', true);
             }
             if (!this.keys.jump.isDown) {
-                this.jumpLock = false;
+                this.canJump = true;
             }
         } else {
             // if (!this.keys.jump.isDown && this.jumpLock) { this.canDoubleJump = true; }
             if (this.keys.left.isDown) { this.move('left', 0.5, false); }
             if (this.keys.right.isDown) { this.move('right', 0.5, false); }
+            if (this.keys.jump.isDown && this.canDoubleJump && this.hasJumped) { this.doubleJump(); }
         }
         // standard jump
-        if (!this.jumpLock && this.keys.jump.isDown && this.body.onFloor()) {
+        if (this.canJump && this.keys.jump.isDown && this.body.onFloor()) {
             this.jump();
-            this.canDoubleJump = true;
         }
-        if (this.jumpLock && this.keys.jump.isDown && !this.body.onFloor() && this.canDoubleJump) {
-            this.jump();
-            this.canDoubleJump = false;
-        }
+
         // Jump key let go
-        // } else if( this.keys.jump.isDown && !this.player.body.onFloor() && this.player.body.velocity.y < -500) {
-        //     this.player.play('roll', true)
-        // } else if (this.player.body.onFloor()) {
-            
-        // }
+        if (!this.keys.jump.isDown && !this.body.onFloor() && !this.canJump) {
+            this.hasJumped = true;
+        }
             
         if (this.body.velocity.y > 0) {
             this.anims.play('jump-down', true);
@@ -82,11 +78,18 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         }
     }
 
-    jump() {
-        console.log('jump: can double', this.canDoubleJump);
+    doubleJump() {
         this.body.setVelocityY(-350);
         this.anims.play('jump-up', true);
-        this.jumpLock = true;
+        this.canDoubleJump = false;
+    }
+
+    jump() {
+        this.body.setVelocityY(-350);
+        this.anims.play('jump-up', true);
+        this.canJump = false;
+        this.hasJumped = false;
+        this.canDoubleJump = true;
     }
 
     handleLanding() {
