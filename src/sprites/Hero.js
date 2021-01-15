@@ -1,8 +1,14 @@
+
+/**
+ * @this {Phaser.GameObjects.Sprite}
+ */
+
 export default class Hero extends Phaser.GameObjects.Sprite {
     constructor(config) {
         super(config.scene, config.x, config.y, config.key);
         config.scene.physics.world.enable(this);
         config.scene.add.existing(this);
+        this.body.setBoundsRectangle(Phaser.Geom.Rectangle.FromXY(740, 0, 1075, 1000));
         this.body.collideWorldBounds = true;
 
         this.scene = config.scene;
@@ -23,6 +29,7 @@ export default class Hero extends Phaser.GameObjects.Sprite {
     }
 
     update(time, delta) {
+        console.log(this.body.x, this.body.y);
         if (this.body.onFloor()) {
             // Landing from jump
             if (this.anims.currentAnim.key === 'jump-down') {

@@ -9,18 +9,19 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-      
+        // this.scale.setGameSize(this.width, this.height);
         buildScene(this);
 
         this.hero = new Hero({
             scene: this,
             key: 'hero',
-            x: 25,
-            y: 50
-        })
+            x: 800,
+            y: 300
+        });
 
         this.physics.add.collider(this.hero, this.platforms);
-        // this.cameras.main.startFollow(this.hero);
+        // this.cameras.main.setViewport(0, 0, 200, 600);
+        this.cameras.main.setZoom(3);
     }
 
     update(time, delta) {
