@@ -17,6 +17,7 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.jumpForce = 1;
         this.canJump = false;
         this.canDoubleJump = false;
+        this.hasDoubleJumped = false;
         this.hasJumped = false;
 
         this.keys = {
@@ -80,8 +81,9 @@ export default class Hero extends Phaser.GameObjects.Sprite {
 
     doubleJump() {
         this.body.setVelocityY(-350);
-        this.anims.play('jump-up', true);
+        this.anims.play('roll', true);
         this.canDoubleJump = false;
+        this.hasDoubleJumped = true;
     }
 
     jump() {
@@ -90,13 +92,14 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.canJump = false;
         this.hasJumped = false;
         this.canDoubleJump = true;
+        this.hasDoubleJumped = false;
     }
 
     handleLanding() {
         // Land and run
         if (this.keys.right.isDown || this.keys.left.isDown) {
             this.body.setVelocityX(this.body.velocity.x / 2);
-            this.anims.play('jump-down-light', true);
+            if (!this.hasDoubleJumped) { this.anims.play('jump-down-light', true); }
             this.lock = true;
         }
         // land and stop
