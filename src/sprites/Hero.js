@@ -19,6 +19,12 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.canDoubleJump = false;
         this.hasDoubleJumped = false;
         this.hasJumped = false;
+        this.canSlideBoost = true;
+        this.slideCooldown = 3;
+        this.jumpTimer = null;
+        this.canSlide = true;
+        this.hasSlid = false;
+        this.isSliding = false;
 
         this.keys = {
             jump: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP),
@@ -31,20 +37,39 @@ export default class Hero extends Phaser.GameObjects.Sprite {
     }
 
     update(time, delta) {
+        console.log('sliding', this.isSliding);
         if (this.body.onFloor()) {
             // Landing from jump
             if (this.anims.currentAnim.key === 'jump-down') {
                 this.handleLanding();
-                // on ground
+            }
+            if (this.keys.down.isDown) {
+                // Player is moving
+                if (this.body.velocity.x !== 0) {
+                    this.isSliding = true;
+                    if (this.canSlide) {
+                        this.slide();
+                    }
+                    // if (this.canSlide) {
+                    //     this.slide();
+                    //     if (this.hasSlid) { this.canSlide = false; }
+                    //     // console.log('cooldown start');
+                    //     this.jumpTimer = this.scene.time.addEvent({
+                    //         delay: 5000,
+                    //         callback: () => {
+                    //             console.log('cooldown done');
+                    //             this.canSlide = true;
+                    //         }
+                    //     });
+                    // }
+                } else {
+                    // Player is staning still (crouch)
+                    this.anims.play('crouch', false);
+                }
             } else if (!this.lock && this.keys.left.isDown && this.body.onFloor()) {
                 this.move('left');
             } else if (!this.lock && this.keys.right.isDown & this.body.onFloor()) {
                 this.move('right');
-            } else if (this.keys.down.isDown) {
-                this.anims.play('jump-down-light', false);
-                if (this.body.velocity.x !== 0) {
-                    this.slide();
-                }
             } else if (!this.lock) {
                 // Slow down player
                 if (this.body.velocity.x > 0.1 || this.body.velocity.x < -0.1) {
@@ -57,8 +82,11 @@ export default class Hero extends Phaser.GameObjects.Sprite {
             if (!this.keys.jump.isDown) {
                 this.canJump = true;
             }
+            if (!this.keys.down.isDown && this.isSliding) {
+                this.hasSlid = true;
+                this.isSliding = false;
+            }
         } else {
-            // if (!this.keys.jump.isDown && this.jumpLock) { this.canDoubleJump = true; }
             if (this.keys.left.isDown) { this.move('left', 0.5, false); }
             if (this.keys.right.isDown) { this.move('right', 0.5, false); }
             if (this.keys.jump.isDown && this.canDoubleJump && this.hasJumped) { this.doubleJump(); }
@@ -77,6 +105,19 @@ export default class Hero extends Phaser.GameObjects.Sprite {
             this.anims.play('jump-down', true);
             this.lock = true;
         }
+    }
+
+    slide() {
+        this.anims.play('slide', true);
+
+        // if (this.canSlideBoost) { this.body.setVelocityX(this.body.velocity.x * 1.5); }
+        this.body.setVelocityX(this.body.velocity.x / 1.025);
+        if ((this.body.velocity.x > 0 && this.body.velocity.x < 80) || (this.body.velocity.x < 0 && this.body.velocity.x > -80)) {
+            this.body.setVelocityX(0);
+            this.isSliding = false;
+            this.canSlide = false;
+        };
+        // this.canSlideBoost = false;
     }
 
     doubleJump() {
@@ -99,7 +140,7 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         // Land and run
         if (this.keys.right.isDown || this.keys.left.isDown) {
             this.body.setVelocityX(this.body.velocity.x / 2);
-            if (!this.hasDoubleJumped) { this.anims.play('jump-down-light', true); }
+            if (!this.hasDoubleJumped) { this.anims.play('crouch', true); }
             this.lock = true;
         }
         // land and stop
@@ -120,25 +161,5 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.body.setVelocityX(dir * 175 * scale);
         this.setFlipX(direction === 'left');
         if (animate) { this.anims.play('run', true); }
-    }
-
-    moveLeft(scale = 1, animate = true) {
-        this.body.setVelocityX(-175 * scale);
-        this.setFlipX(true);
-        this.anims.play('run', true);
-    }
-
-    moveRight(scale = 1, animate = true) {
-        this.body.setVelocityX(175 * scale);
-        this.setFlipX(false);
-        this.anims.play('run', true);
-    }
-
-    slide() {
-        this.body.setVelocityX(this.body.velocity.x / 1.025);
-        this.anims.play('slide', true);
-        if ((this.body.velocity.x > 0 && this.body.velocity.x < 80) || (this.body.velocity.x < 0 && this.body.velocity.x > -80)) {
-            this.body.setVelocityX(0);
-        };
     }
 }
