@@ -1,3 +1,8 @@
+/**
+ * 
+ * @param {Phaser.Scene} scene 
+ */
+
 export default function makeAnimations(scene) {
     scene.anims.create({
         key: 'jump-up',
@@ -19,7 +24,7 @@ export default function makeAnimations(scene) {
         key: 'crouch',
         frameRate: 15,
         frames: scene.anims.generateFrameNumbers('player-jump', {
-            start: 15, end: 16
+            start: 15, end: 15
         })
     });
 
