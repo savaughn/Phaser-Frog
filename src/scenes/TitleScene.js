@@ -3,6 +3,7 @@ class TitleScene extends Phaser.Scene {
         super({
             key: 'TitleScene'
         });
+        this.gamepad = null;
     }
     preload() {
        
@@ -16,8 +17,8 @@ class TitleScene extends Phaser.Scene {
     }
 
     startGame() {
-        this.scene.stop('GameScene');
-        this.registry.set('attractMode', false);
+        // this.scene.stop('GameScene');
+        // this.registry.set('attractMode', false);
         this.scene.start('GameScene');
     }
 

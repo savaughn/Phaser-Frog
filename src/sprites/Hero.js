@@ -2,10 +2,12 @@ import * as StateMachine from '../helpers/StateMachine.hero';
 
 /**
  * @this {Phaser.GameObjects.Sprite}
+ * @var {Phaser.Input.Gamepad.Gamepad} controller
+ * @var {Phaser.Scene} scene
  */
 
 export default class Hero extends Phaser.GameObjects.Sprite {
-    constructor(config) {
+    constructor(config, myGamepad) {
         super(config.scene, config.x, config.y, config.key);
         config.scene.physics.world.enable(this);
         config.scene.add.existing(this);
@@ -13,7 +15,8 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.body.collideWorldBounds = true;
 
         this.scene = config.scene;
-        this.armed = false;
+        this.gamepad = myGamepad;
+        // this.armed = false;
         this.lock = false;
         this.canSlideBoost = true;
         this.slideCooldown = 3;
@@ -23,6 +26,10 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.isSliding = false;
 
         this.ground = false;
+        this.jumpForce = 1;
+        this.jumpVelocity = -350;
+        this.landing = 'soft';
+        this.move = 0;
 
         // The state machine managing the hero
         this.stateMachine = new StateMachine.StateMachine('idle', {
@@ -36,18 +43,55 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         }, [this.scene, this]);
 
         this.keys = {
-            jump: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP),
+            jump: this.gamepad.A,
             jump2: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
             fire: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z),
             left: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT),
             right: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT),
-            down: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN)
+            down: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN),
+            dec: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+            inc: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O)
         };
+        this.leftAxis = new Phaser.Input.Gamepad.Axis(this.gamepad, 0);
     }
 
     update(time, delta) {
+        this.val = this.leftAxis.getValue();
+        console.log(this.val);
+        // console.log('a', this.gamepad.axes[0].value);
+        // console.log('x', this.gamepad.axes[1].value);
+        // console.log(this.gamepad.axes[2].value);
+        // console.log(this.gamepad.axes[3].value);
+        // console.log(this.keys.jump);
+        // let pad;
+        // if (this.scene.input) {
+        //     console.log('connected');
+        // }
+        // this.scene.input.gamepad.getPad(0);
+        // let pad;
+        // if (this.scene.input.gamepad.gamepads.length > 0) {
+        //     pad = this.scene.input.gamepad.pad1;
+        // }
+        // console.log(this.scene.input.gamepad);
+        // console.log(this.gamepad);
         this.ground = this.body.onFloor();
         this.stateMachine.step();
+        if (this.keys.inc.isDown) {
+            this.jumpForce += 0.01;
+            console.log('Jump: ' + this.jumpVelocity * this.jumpForce);
+        }
+
+        if (this.keys.dec.isDown) {
+            this.jumpForce -= 0.01;
+            console.log('Jump: ' + this.jumpVelocity * this.jumpForce);
+        }
+
+        // console.log(this.leftAxis.getValue(0))
+
+        // this.once('animationcomplete', anim => {
+        //     this.once(`animationcomplete_${anim.key}`);
+        // }, this);
+
         // if (this.body.onFloor()) {
         //     // Landing from jump
         //     if (this.anims.currentAnim.key === 'jump-down') {
