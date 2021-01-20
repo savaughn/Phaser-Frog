@@ -109,7 +109,6 @@ class MoveState extends State {
      */
     enter(scene, hero) {
         let dir = isFacingLeft ? -1 : 1;
-        console.log(dir * 175);
         hero.body.setVelocityX(dir * 175);
         hero.setFlipX(isFacingLeft);
         hero.anims.play('run');
@@ -187,6 +186,8 @@ class JumpState extends State {
 
     enter(scene, hero) {
         if (hero.ground) {
+            hero.canDoubleJump = false;
+            hero.hasJumped = true;
             hero.body.setVelocityY(hero.jumpVelocity * hero.jumpForce);
             hero.anims.play('jump-up', true);
         }
@@ -198,7 +199,7 @@ class JumpState extends State {
      * @param {Phaser.GameObjects.Sprite} hero
      */
     execute(scene, hero) {
-        if (!hero.ground && !hero.gamepad.A && hero.hasJumped) {
+        if (!hero.gamepad.A && hero.hasJumped && !hero.canDoubleJump) {
             hero.canDoubleJump = true;
         } else if (hero.gamepad.A && hero.canDoubleJump) {
             this.stateMachine.transition('doubleJump');
@@ -238,8 +239,6 @@ class JumpState extends State {
                 });
             }
         }
-
-        hero.hasJumped = true;
     }
 }
 
@@ -251,6 +250,7 @@ class DoubleJumpState extends State {
      */
     enter(scene, hero) {
         hero.canDoubleJump = false;
+        hero.hasJumped = false;
         hero.body.setVelocityY(hero.jumpVelocity * 1.1);
         hero.anims.play({
             key: 'roll', repeat: 0

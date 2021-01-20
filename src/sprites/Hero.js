@@ -32,6 +32,8 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.move = 0;
         this.isFacingLeft = false;
 
+        this.canDoubleJump = false;
+
         // The state machine managing the hero
         this.stateMachine = new StateMachine.StateMachine('jump', {
             idle: new StateMachine.IdleState(),
