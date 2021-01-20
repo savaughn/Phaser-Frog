@@ -1,3 +1,7 @@
+let inputAxis = 0;
+let isFacingLeft = false;
+const controllerThreshold = 0.8;
+
 class StateMachine {
     constructor(initialState, possibleStates, stateArgs = []) {
         this.initialState = initialState;
@@ -6,6 +10,7 @@ class StateMachine {
         this.state = null;
         this.stateArgs[1].canDoubleJump = false;
         this.stateArgs[1].hasJumped = false;
+        isFacingLeft = this.stateArgs[1].isFacingLeft;
 
         // State instances get access to the state machine via this.stateMachine.
         for (const state of Object.values(this.possibleStates)) {
@@ -30,6 +35,10 @@ class StateMachine {
             this.state = this.initialState;
             this.possibleStates[this.state].enter(...this.stateArgs);
         }
+
+        inputAxis = this.stateArgs[1].leftAxis.value;
+        if (inputAxis < -1 * controllerThreshold) { isFacingLeft = true; }
+        if (inputAxis > controllerThreshold) { isFacingLeft = false; }
 
         // Run the current state's execute
         this.possibleStates[this.state].execute(...this.stateArgs);
@@ -69,6 +78,8 @@ class IdleState extends State {
             left, right, jump, down
         } = hero.keys;
 
+        // console.log(this.inputAxis);
+
         // Transition to crouch if pressing down
         if (hero.gamepad.X) {
             this.stateMachine.transition('crouch');
@@ -80,12 +91,12 @@ class IdleState extends State {
         }
 
         // Transition to move if pressing a movement key
-        if (hero.val < 0.1) {
-            this.stateMachine.transition('move', hero.val);
+        if (inputAxis < -1 * controllerThreshold) {
+            this.stateMachine.transition('move');
         }
 
-        if (hero.val > 0.1) {
-            this.stateMachine.transition('move', hero.val);
+        if (inputAxis > controllerThreshold) {
+            this.stateMachine.transition('move');
         }
     }
 }
@@ -96,31 +107,25 @@ class MoveState extends State {
      * @param {Phaser.Scene} scene
      * @param {Phaser.GameObjects.Sprite} hero
      */
+    enter(scene, hero) {
+        let dir = isFacingLeft ? -1 : 1;
+        console.log(dir * 175);
+        hero.body.setVelocityX(dir * 175);
+        hero.setFlipX(isFacingLeft);
+        hero.anims.play('run');
+    }
 
-    execute(scene, hero, move) {
+    execute(scene, hero) {
         const {
             left, right, down, jump
         } = hero.keys;
-
-        const move1 = direction => {
-            hero.body.setVelocityX(direction * 175);
-            hero.setFlipX(direction < 0);
-            hero.anims.play('run', true);
-        };
-
-        if (hero.val < -0.1) {
-            move1(hero.val);
-        }
-        if (hero.val > 0.1) {
-            move1(hero.val);
-        }
 
         if (hero.gamepad.X) {
             this.stateMachine.transition('slide');
         }
 
         // Transition to idle if not pressing movement keys
-        if (!left.isDown && !right.isDown) {
+        if (inputAxis > -1 * controllerThreshold && inputAxis < controllerThreshold) {
             this.stateMachine.transition('idle');
         }
 
@@ -139,11 +144,10 @@ class SlideState extends State {
         // if (this.canSlideBoost) { this.body.setVelocityX(this.body.velocity.x * 1.5); }
         hero.body.setVelocityX(hero.body.velocity.x / 1.025);
         if ((hero.body.velocity.x > 0 && hero.body.velocity.x < 80) || (hero.body.velocity.x < 0 && hero.body.velocity.x > -80)) {
-            // hero.body.setVelocityX(0);
             this.stateMachine.transition('crouch');
         };
 
-        if (!hero.gamepad.A) {
+        if (!hero.gamepad.X) {
             this.stateMachine.transition('idle');
         }
         // this.canSlideBoost = false;
@@ -159,7 +163,6 @@ class CrouchState extends State {
     enter(scene, hero) {
         hero.body.setVelocity(0);
         hero.anims.play('crouch', false);
-        // scene.
     }
 
     /**
@@ -206,11 +209,11 @@ class JumpState extends State {
             hero.anims.play('jump-down');
         }
 
-        if (hero.keys.left.isDown) {
+        if (inputAxis < -1 * controllerThreshold) {
             hero.setFlipX(true);
             hero.body.setVelocityX(-175);
         }
-        if (hero.keys.right.isDown) {
+        if (inputAxis > controllerThreshold) {
             hero.setFlipX(false);
             hero.body.setVelocityX(175);
         }
@@ -270,47 +273,6 @@ class DoubleJumpState extends State {
     }
 }
 
-class FallState extends State {
-    enter(scene, hero, params = {}) {
-        hero.anims.play('jump-down', true);
-    }
-
-    /**
-     * 
-     * @param {*} scene 
-     * @param {Phaser.GameObjects.Sprite} hero 
-     */
-    execute(scene, hero) {
-        if (hero.canDoubleJump && hero.gamepad.A) {
-            this.stateMachine.transition('doubleJump');
-        }
-
-        // // Landing no running
-        // if (hero.ground) {
-        //     // A little slide on landing
-        //     if (hero.body.velocity.x !== 0) {
-        //         if (hero.body.velocity.x > 0.1 || hero.body.velocity.x < -0.1) {
-        //             hero.body.setVelocityX(hero.body.velocity.x / 1.35);
-        //         }
-        //     }
-
-        //     if (hero.landing === 'hard') {
-        //         hero.on('animationcomplete_jump-down', () => {
-        //             this.stateMachine.transition('idle');
-        //         });
-        //     } else {
-        //         hero.anims.play('crouch', true);
-        //         hero.on('animationcomplete_crouch', () => {
-        //             this.stateMachine.transition('idle');
-        //         });
-        //     }
-        // }
-
-        if (hero.keys.left.isDown) { hero.body.setVelocityX(-175); }
-        if (hero.keys.right.isDown) { hero.body.setVelocityX(175); }
-    }
-}
-
 export {
-    StateMachine, CrouchState, IdleState, MoveState, JumpState, DoubleJumpState, FallState, SlideState
+    StateMachine, CrouchState, IdleState, MoveState, JumpState, DoubleJumpState, SlideState
 };

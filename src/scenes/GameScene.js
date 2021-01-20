@@ -18,7 +18,7 @@ class GameScene extends Phaser.Scene {
             x: 800,
             y: 300
         },
-        this.input.gamepad.pad1
+        this.input.gamepad.getPad(0)
         );
 
         this.physics.add.collider(this.hero, this.platforms);

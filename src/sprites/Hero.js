@@ -30,15 +30,15 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.jumpVelocity = -350;
         this.landing = 'soft';
         this.move = 0;
+        this.isFacingLeft = false;
 
         // The state machine managing the hero
-        this.stateMachine = new StateMachine.StateMachine('idle', {
+        this.stateMachine = new StateMachine.StateMachine('jump', {
             idle: new StateMachine.IdleState(),
             move: new StateMachine.MoveState(),
             crouch: new StateMachine.CrouchState(),
             jump: new StateMachine.JumpState(),
             doubleJump: new StateMachine.DoubleJumpState(),
-            fall: new StateMachine.FallState(),
             slide: new StateMachine.SlideState()
         }, [this.scene, this]);
 
@@ -52,12 +52,20 @@ export default class Hero extends Phaser.GameObjects.Sprite {
             dec: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
             inc: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O)
         };
-        this.leftAxis = new Phaser.Input.Gamepad.Axis(this.gamepad, 0);
+        // console.log(this.gamepad);
+        this.leftAxis = this.gamepad._HAxisLeft;
+        // this.leftAxis = new Phaser.Input.Gamepad.Axis(this.gamepad.pad, 0);
     }
 
     update(time, delta) {
-        this.val = this.leftAxis.getValue();
-        console.log(this.val);
+
+        // console.log(this.leftAxis.value);
+        // console.log(this.gamepad.pad.axes[1]);
+        // console.log(this.gamepad.pad.axes[2]);
+        // console.log(this.gamepad.pad.axes[3]);
+        // console.log(this.leftAxis);
+        // this.val = this.leftAxis.value;
+        // console.log(this.val);
         // console.log('a', this.gamepad.axes[0].value);
         // console.log('x', this.gamepad.axes[1].value);
         // console.log(this.gamepad.axes[2].value);
@@ -76,15 +84,15 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         // console.log(this.gamepad);
         this.ground = this.body.onFloor();
         this.stateMachine.step();
-        if (this.keys.inc.isDown) {
-            this.jumpForce += 0.01;
-            console.log('Jump: ' + this.jumpVelocity * this.jumpForce);
-        }
+        // if (this.keys.inc.isDown) {
+        //     this.jumpForce += 0.01;
+        //     console.log('Jump: ' + this.jumpVelocity * this.jumpForce);
+        // }
 
-        if (this.keys.dec.isDown) {
-            this.jumpForce -= 0.01;
-            console.log('Jump: ' + this.jumpVelocity * this.jumpForce);
-        }
+        // if (this.keys.dec.isDown) {
+        //     this.jumpForce -= 0.01;
+        //     console.log('Jump: ' + this.jumpVelocity * this.jumpForce);
+        // }
 
         // console.log(this.leftAxis.getValue(0))
 
