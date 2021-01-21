@@ -2,7 +2,7 @@ import * as StateMachine from '../helpers/StateMachine.hero';
 
 /**
  * @this {Phaser.GameObjects.Sprite}
- * @var {Phaser.Input.Gamepad.Gamepad} controller
+ * @var {Phaser.Input.Gamepad.Gamepad} gamepad
  * @var {Phaser.Scene} scene
  */
 
@@ -20,8 +20,10 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.lock = false;
         this.canSlideBoost = true;
         this.slideCooldown = 3;
-        this.jumpTimer = null;
+        this.slideTimer = null;
         this.canSlide = true;
+        this.forceSlideTimer = null;
+        this.forceSlide = true;
         this.hasSlid = false;
         this.isSliding = false;
 
@@ -54,53 +56,13 @@ export default class Hero extends Phaser.GameObjects.Sprite {
             dec: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
             inc: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O)
         };
-        // console.log(this.gamepad);
+
         this.leftAxis = this.gamepad._HAxisLeft;
-        // this.leftAxis = new Phaser.Input.Gamepad.Axis(this.gamepad.pad, 0);
     }
 
     update(time, delta) {
-
-        // console.log(this.leftAxis.value);
-        // console.log(this.gamepad.pad.axes[1]);
-        // console.log(this.gamepad.pad.axes[2]);
-        // console.log(this.gamepad.pad.axes[3]);
-        // console.log(this.leftAxis);
-        // this.val = this.leftAxis.value;
-        // console.log(this.val);
-        // console.log('a', this.gamepad.axes[0].value);
-        // console.log('x', this.gamepad.axes[1].value);
-        // console.log(this.gamepad.axes[2].value);
-        // console.log(this.gamepad.axes[3].value);
-        // console.log(this.keys.jump);
-        // let pad;
-        // if (this.scene.input) {
-        //     console.log('connected');
-        // }
-        // this.scene.input.gamepad.getPad(0);
-        // let pad;
-        // if (this.scene.input.gamepad.gamepads.length > 0) {
-        //     pad = this.scene.input.gamepad.pad1;
-        // }
-        // console.log(this.scene.input.gamepad);
-        // console.log(this.gamepad);
         this.ground = this.body.onFloor();
         this.stateMachine.step();
-        // if (this.keys.inc.isDown) {
-        //     this.jumpForce += 0.01;
-        //     console.log('Jump: ' + this.jumpVelocity * this.jumpForce);
-        // }
-
-        // if (this.keys.dec.isDown) {
-        //     this.jumpForce -= 0.01;
-        //     console.log('Jump: ' + this.jumpVelocity * this.jumpForce);
-        // }
-
-        // console.log(this.leftAxis.getValue(0))
-
-        // this.once('animationcomplete', anim => {
-        //     this.once(`animationcomplete_${anim.key}`);
-        // }, this);
 
         // if (this.body.onFloor()) {
         //     // Landing from jump
@@ -155,49 +117,6 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         //     if (this.keys.right.isDown) { this.move('right', 0.5, false); }
         //     if (this.keys.jump.isDown && this.canDoubleJump && this.hasJumped) { this.doubleJump(); }
         // }
-        // // standard jump
-        // if (this.canJump && this.keys.jump.isDown && this.body.onFloor()) {
-        //     this.jump();
-        // }
-
-        // // Jump key let go
-        // if (!this.keys.jump.isDown && !this.body.onFloor() && !this.canJump) {
-        //     this.hasJumped = true;
-        // }
-            
-        // if (this.body.velocity.y > 0) {
-        //     this.anims.play('jump-down', true);
-        //     this.lock = true;
-        // }
-    }
-
-    slide() {
-        this.anims.play('slide', true);
-        this.isSliding = true;
-        // if (this.canSlideBoost) { this.body.setVelocityX(this.body.velocity.x * 1.5); }
-        this.body.setVelocityX(this.body.velocity.x / 1.025);
-        if ((this.body.velocity.x > 0 && this.body.velocity.x < 80) || (this.body.velocity.x < 0 && this.body.velocity.x > -80)) {
-            this.body.setVelocityX(0);
-            this.isSliding = false;
-            this.canSlide = false;
-        };
-        // this.canSlideBoost = false;
-    }
-
-    doubleJump() {
-        this.body.setVelocityY(-350);
-        this.anims.play('roll', true);
-        this.canDoubleJump = false;
-        this.hasDoubleJumped = true;
-    }
-
-    jump() {
-        this.body.setVelocityY(-350);
-        this.anims.play('jump-up', true);
-        this.canJump = false;
-        this.hasJumped = false;
-        this.canDoubleJump = true;
-        this.hasDoubleJumped = false;
     }
 
     handleLanding() {
@@ -214,16 +133,9 @@ export default class Hero extends Phaser.GameObjects.Sprite {
             this.body.setVelocityX(0);
         }
         // idle from landing
-        this.on('animationcomplete', () => {
-            this.anims.play('idle', true);
-            this.lock = false;
-        });
-    }
-
-    move(direction, scale = 1, animate = true) {
-        const dir = direction === 'right' ? 1 : -1;
-        this.body.setVelocityX(dir * 175 * scale);
-        this.setFlipX(direction === 'left');
-        if (animate) { this.anims.play('run', true); }
+        // this.on('animationcomplete', () => {
+        //     this.anims.play('idle', true);
+        //     this.lock = false;
+        // });
     }
 }
