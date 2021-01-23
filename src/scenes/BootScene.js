@@ -25,7 +25,6 @@ class BootScene extends Phaser.Scene {
         this.load.on('complete', () => {
             makeAnimations(this);
             progress.destroy();
-            this.input.gamepad.start();
             this.input.gamepad.once('connected', () => {
                 this.scene.start('GameScene');
             });

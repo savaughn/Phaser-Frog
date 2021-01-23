@@ -47,7 +47,7 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         }, [this.scene, this]);
 
         this.keys = {
-            jump: this.gamepad.A,
+            jump: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP),
             jump2: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
             fire: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z),
             left: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT),
@@ -61,62 +61,8 @@ export default class Hero extends Phaser.GameObjects.Sprite {
     }
 
     update(time, delta) {
-        this.ground = this.body.onFloor();
+        // this.ground = this.body.onFloor();
         this.stateMachine.step();
-
-        // if (this.body.onFloor()) {
-        //     // Landing from jump
-        //     if (this.anims.currentAnim.key === 'jump-down') {
-        //         this.handleLanding();
-        //     }
-        //     if (this.keys.down.isDown) {
-        //         // Player is moving
-        //         if (this.body.velocity.x !== 0) {
-        //             if (this.canSlide) {
-        //                 this.slide();
-        //             }
-        //             // if (this.canSlide) {
-        //             //     this.slide();
-        //             //     if (this.hasSlid) { this.canSlide = false; }
-        //             //     // console.log('cooldown start');
-        //             //     this.jumpTimer = this.scene.time.addEvent({
-        //             //         delay: 5000,
-        //             //         callback: () => {
-        //             //             console.log('cooldown done');
-        //             //             this.canSlide = true;
-        //             //         }
-        //             //     });
-        //             // }
-        //         } else {
-        //             console.log('crouch');
-        //             // Player is staning still (crouch)
-        //             this.anims.play('crouch', false);
-        //         }
-        //     } else if (!this.lock && this.keys.left.isDown && this.body.onFloor()) {
-        //         this.move('left');
-        //     } else if (!this.lock && this.keys.right.isDown & this.body.onFloor()) {
-        //         this.move('right');
-        //     } else if (!this.lock) {
-        //         // Slow down player
-        //         if (this.body.velocity.x > 0.1 || this.body.velocity.x < -0.1) {
-        //             this.body.setVelocityX(this.body.velocity.x / 2);
-        //         } else {
-        //             this.body.setVelocityX(0);
-        //         }
-        //         this.anims.play('idle', true);
-        //     }
-        //     if (!this.keys.jump.isDown) {
-        //         this.canJump = true;
-        //     }
-        //     if (!this.keys.down.isDown && this.isSliding) {
-        //         this.hasSlid = true;
-        //         this.isSliding = false;
-        //     }
-        // } else {
-        //     if (this.keys.left.isDown) { this.move('left', 0.5, false); }
-        //     if (this.keys.right.isDown) { this.move('right', 0.5, false); }
-        //     if (this.keys.jump.isDown && this.canDoubleJump && this.hasJumped) { this.doubleJump(); }
-        // }
     }
 
     handleLanding() {
@@ -132,10 +78,5 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         } else {
             this.body.setVelocityX(0);
         }
-        // idle from landing
-        // this.on('animationcomplete', () => {
-        //     this.anims.play('idle', true);
-        //     this.lock = false;
-        // });
     }
 }
