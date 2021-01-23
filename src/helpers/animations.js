@@ -22,10 +22,11 @@ export default function makeAnimations(scene) {
 
     scene.anims.create({
         key: 'crouch',
-        frameRate: 15,
+        frameRate: 1,
         frames: scene.anims.generateFrameNumbers('player-jump', {
             start: 15, end: 15
-        })
+        }),
+        repeat: 0
     });
 
     scene.anims.create({
@@ -60,8 +61,7 @@ export default function makeAnimations(scene) {
         frameRate: 12,
         frames: scene.anims.generateFrameNumbers('player-roll', {
             start: 0, end: 5
-        }),
-        repeat: -1
+        })
     });
 
     scene.anims.create({
