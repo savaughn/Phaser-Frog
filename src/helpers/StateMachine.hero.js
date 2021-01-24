@@ -136,7 +136,7 @@ class MoveState extends State {
         let dir = isFacingLeft ? -1 : 1;
         hero.body.setVelocityX(dir * 175);
         hero.setFlipX(isFacingLeft);
-        if (hero.body.onFloor()) {
+        if (hero.body.onFloor() && !hero.gamepad.A) {
             hero.anims.play('run');
         }
     }
@@ -221,6 +221,7 @@ class JumpState extends State {
         if (hero.body.onFloor()) {
             hero.canDoubleJump = false;
             hero.hasJumped = true;
+            hero.anims.stop();
             hero.body.setVelocityY(hero.jumpVelocity * hero.jumpForce);
             hero.anims.play('jump-up', true);
         }

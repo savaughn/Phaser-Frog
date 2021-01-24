@@ -31,7 +31,6 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.jumpForce = 1;
         this.jumpVelocity = -350;
         this.landing = 'soft';
-        this.move = 0;
         this.isFacingLeft = false;
 
         this.canDoubleJump = false;
@@ -61,7 +60,6 @@ export default class Hero extends Phaser.GameObjects.Sprite {
     }
 
     update(time, delta) {
-        // this.ground = this.body.onFloor();
         this.stateMachine.step();
     }
 

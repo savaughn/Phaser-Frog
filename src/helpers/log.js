@@ -1,4 +1,4 @@
-let shouldLog = false;
+let shouldLog = true;
 
 function toggleLoggingOn() {
     shouldLog = true;
