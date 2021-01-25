@@ -3,7 +3,6 @@ import * as Logger from './log';
 let inputAxis = 0;
 let isFacingLeft = false;
 const controllerThreshold = 0.8;
-let timeout = 1000;
 
 class StateMachine {
     constructor(initialState, possibleStates, stateArgs = []) {
@@ -79,11 +78,19 @@ class State {
 }
 
 class IdleState extends State {
+    /**
+     * 
+     * @param {*} scene 
+     * @param {Phaser.GameObjects.Sprite} hero 
+     */
     enter(scene, hero) {
         hero.canDoubleJump = false;
         hero.hasJumped = false;
         hero.body.setVelocity(0);
-        hero.anims.play('idle', true);
+        if (!hero.anims.isPlaying) {
+            hero.anims.play('idle');
+        }
+        hero.removeAllListeners();
     }
 
     /**
@@ -115,12 +122,29 @@ class IdleState extends State {
 
 class CrouchState extends State {
     enter(scene, hero) {
-        hero.body.setVelocity(0);
         hero.anims.play('crouch');
+        scene.time.delayedCall(100, () => {
+            this.canStand = true;
+        });
     }
 
+    /**
+     * 
+     * @todo add time delay for crouch anim 
+     */
     execute(scene, hero) {
-        if (!hero.gamepad.B) {
+        // Slow crouching sprite with velocity
+        if (hero.body.velocity.x !== 0) {
+            if (hero.body.velocity.x > 0.1 || hero.body.velocity.x < -0.1) {
+                hero.body.setVelocityX(hero.body.velocity.x / 1.35);
+            } else {
+                hero.body.setVelocityX(0);
+            }
+        }
+
+        if (!hero.gamepad.B && this.canStand) {
+            hero.anims.stop();
+            this.canStand = false;
             this.stateMachine.transition('idle');
         }
     }
@@ -136,6 +160,7 @@ class MoveState extends State {
         let dir = isFacingLeft ? -1 : 1;
         hero.body.setVelocityX(dir * 175);
         hero.setFlipX(isFacingLeft);
+        // stops running anim on hop
         if (hero.body.onFloor() && !hero.gamepad.A) {
             hero.anims.play('run');
         }
@@ -143,15 +168,18 @@ class MoveState extends State {
 
     execute(scene, hero) {
         if (hero.gamepad.B && hero.canSlide) {
+            hero.anims.stop();
             this.stateMachine.transition('slide');
         }
 
         if (hero.gamepad.A) {
+            hero.anims.stop();
             this.stateMachine.transition('jump');
         }
 
         // Transition to idle if not pressing movement keys
         if (inputAxis > -1 * controllerThreshold && inputAxis < controllerThreshold) {
+            hero.anims.stop();
             this.stateMachine.transition('idle');
         }
     }
@@ -161,6 +189,12 @@ class MoveState extends State {
  * @todo fix force slide minimum
  */
 class SlideState extends State {
+    constructor({
+        inputAxisValue
+    }) {
+        super();
+        this.currentAxis = inputAxisValue;
+    }
     startCooldown(scene, hero) {
         hero.slideTimer = scene.time.addEvent({
             delay: 250,
@@ -173,17 +207,20 @@ class SlideState extends State {
         hero.anims.stop();
         hero.anims.play('slide', false);
         hero.forceTimer = scene.time.addEvent({
-            delay: 900,
+            delay: 300,
             callback: () => {
                 hero.forceSlide = false;
             }
         });
+        this.currentAxis = inputAxis;
     }
     execute(scene, hero) {
+        // slow moving sprite
         hero.body.setVelocityX(hero.body.velocity.x / 1.025);
-        if ((hero.body.velocity.x > 0 && hero.body.velocity.x < 80) ||
-        (hero.body.velocity.x < 0 && hero.body.velocity.x > -80 &&
-        !hero.forceSlide)) {
+        // if too slow and not force, then crouch
+        if (((hero.body.velocity.x > 0 && hero.body.velocity.x < 80) ||
+        (hero.body.velocity.x < 0 && hero.body.velocity.x > -80)) &&
+        !hero.forceSlide) {
             hero.canSlide = false;
             this.startCooldown(scene, hero);
             hero.forceSlide = true;
@@ -191,14 +228,13 @@ class SlideState extends State {
             this.stateMachine.transition('crouch');
         };
 
+        // if ((!hero.gamepad.B && !hero.forceSlide) || this.currentAxis !== inputAxis) {
         if (!hero.gamepad.B && !hero.forceSlide) {
             hero.canSlide = false;
             this.startCooldown(scene, hero);
-            if (!hero.forceSlide) {
-                hero.forceSlide = true;
-                hero.anims.stop();
-                this.stateMachine.transition('idle');
-            }
+            hero.forceSlide = true;
+            hero.anims.stop();
+            this.stateMachine.transition('idle');
         }
 
         if (hero.body.velocity.x === 0 && !hero.forceSlide) {
@@ -253,45 +289,16 @@ class JumpState extends State {
             hero.body.setVelocityX(175);
         }
 
-        // Landing no running
-        /**
-         * @todo Should be a state?
-         */
         if (hero.body.onFloor()) {
-            // A little slide on landing
-            if (hero.body.velocity.x !== 0) {
-                if (hero.body.velocity.x > 0.1 || hero.body.velocity.x < -0.1) {
-                    hero.body.setVelocityX(hero.body.velocity.x / 1.35);
-                }
+            if (!hero.hasJumped && !hero.canDoubleJump) {
+                hero.landing = 'hard';
             }
-
-            if (hero.landing === 'hard') {
-                hero.on('animationcomplete', anim => {
-                    console.log('test 1');
-                    if (anim.key === 'jump-down') { this.stateMachine.transition('idle'); }
-                });
-            } else {
-                hero.anims.play('crouch', true);
-                // hero.on('animationcomplete', anim => {
-                //     console.log(anim.key + ' complete');
-                // });
-                // hero.on('animationcomplete-crouch', anim => {
-                //     // console.log('test 2: ' + anim.key);
-                //     console.log('test 2');
-                // if (anim.key === 'crouch') { this.stateMachine.transition('idle'); }
-                this.stateMachine.transition('crouch');
-                // });
-            }
+            this.stateMachine.transition('land');
         }
     }
 }
 
 class DoubleJumpState extends State {
-    /**
-     *
-     * @param {Phaser.Scene} scene
-     * @param {Phaser.GameObjects.Sprite} hero
-     */
     enter(scene, hero) {
         hero.canDoubleJump = false;
         hero.hasJumped = false;
@@ -299,17 +306,34 @@ class DoubleJumpState extends State {
         hero.anims.play('roll');
     }
 
-    /**
-     *
-     * @param {Phaser.Scene} scene
-     * @param {Phaser.GameObjects.Sprite} hero
-     */
     execute(scene, hero) {
         hero.landing = 'hard';
         this.stateMachine.transition('jump');
     }
 }
 
+class LandingState extends State {
+    /**
+     * 
+     * @param {*} scene 
+     * @param {Phaser.GameObjects.Sprite} hero 
+     */
+    enter(scene, hero) {
+        hero.once('animationcomplete-hard-land', anim => {
+            // hero.removeAllListeners('animationcomplete-hard-land');
+            this.stateMachine.transition('idle');
+        });
+    }
+    execute(scene, hero) {
+        if (hero.landing === 'soft') {
+            this.stateMachine.transition('crouch');
+        } else {
+            hero.body.setVelocityX(0);
+            hero.anims.play('hard-land', true);
+        }
+    }
+}
+
 export {
-    StateMachine, CrouchState, IdleState, MoveState, JumpState, DoubleJumpState, SlideState
+    StateMachine, CrouchState, IdleState, MoveState, JumpState, DoubleJumpState, SlideState, LandingState
 };

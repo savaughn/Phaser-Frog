@@ -16,7 +16,15 @@ export default function makeAnimations(scene) {
         key: 'jump-down',
         frameRate: 11,
         frames: scene.anims.generateFrameNumbers('player-jump', {
-            start: 8, end: 16
+            start: 8, end: 12
+        })
+    });
+
+    scene.anims.create({
+        key: 'hard-land',
+        frameRate: 11,
+        frames: scene.anims.generateFrameNumbers('player-jump', {
+            start: 13, end: 16
         })
     });
 

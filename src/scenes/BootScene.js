@@ -1,5 +1,4 @@
 import makeAnimations from '../helpers/animations';
-import { game } from '../main';
 
 /**
  * @this {Phaser.Scene}
