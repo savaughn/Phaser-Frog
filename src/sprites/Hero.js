@@ -63,19 +63,4 @@ export default class Hero extends Phaser.GameObjects.Sprite {
     update(time, delta) {
         this.stateMachine.step();
     }
-
-    handleLanding() {
-        // Land and run
-        if (this.keys.right.isDown || this.keys.left.isDown) {
-            this.body.setVelocityX(this.body.velocity.x / 2);
-            if (!this.hasDoubleJumped) { this.anims.play('crouch', true); }
-            this.lock = true;
-        }
-        // land and stop
-        if (this.body.velocity.x > 0.1 || this.body.velocity.x < -0.1) {
-            this.body.setVelocityX(this.body.velocity.x / 1.35);
-        } else {
-            this.body.setVelocityX(0);
-        }
-    }
 }
