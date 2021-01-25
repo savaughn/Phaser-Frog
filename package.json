@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "webpack --mode=development",
     "deploy": "webpack  --mode=production --config webpack.production.config.js",
-    "test": "eslint ./src/**/**.js"
+    "test": "eslint ./src/**/**.js",
+    "firebase-deploy": "npm run deploy && firebase deploy"
   },
   "license": "MIT",
   "devDependencies": {
