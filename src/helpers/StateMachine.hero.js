@@ -2,7 +2,7 @@ import * as Logger from './log';
 
 let inputAxis = 0;
 let isFacingLeft = false;
-const controllerThreshold = 0.8;
+const controllerThreshold = 0.6;
 
 class StateMachine {
     constructor(initialState, possibleStates, stateArgs = []) {
@@ -142,6 +142,10 @@ class CrouchState extends State {
             }
         }
 
+        if (hero.gamepad.A) {
+            this.stateMachine.transition('jump');
+        }
+
         if (!hero.gamepad.B && this.canStand) {
             hero.anims.stop();
             this.canStand = false;
@@ -158,8 +162,9 @@ class MoveState extends State {
      */
     enter(scene, hero) {
         let dir = isFacingLeft ? -1 : 1;
-        hero.body.setVelocityX(dir * 175);
-        hero.setFlipX(isFacingLeft);
+        // hero.body.setVelocityX(dir * 175);
+        // hero.body.setVelocityX(inputAxis * 175);
+        // hero.setFlipX(isFacingLeft);
         // stops running anim on hop
         if (hero.body.onFloor() && !hero.gamepad.A) {
             hero.anims.play('run');
@@ -167,6 +172,9 @@ class MoveState extends State {
     }
 
     execute(scene, hero) {
+        hero.body.setVelocityX(inputAxis * 175);
+        hero.setFlipX(isFacingLeft);
+
         if (hero.gamepad.B && hero.canSlide) {
             hero.anims.stop();
             this.stateMachine.transition('slide');
@@ -185,9 +193,6 @@ class MoveState extends State {
     }
 }
 
-/**
- * @todo fix force slide minimum
- */
 class SlideState extends State {
     constructor({
         inputAxisValue
@@ -251,6 +256,7 @@ class JumpState extends State {
      * @param {Phaser.Scene} scene
      * @param {Phaser.GameObjects.Sprite} hero
      * @todo charge jump - check time button down. tap for short jump.
+     * @todo crouch in jump
      */
 
     enter(scene, hero) {
@@ -269,6 +275,17 @@ class JumpState extends State {
      * @param {Phaser.GameObjects.Sprite} hero
      */
     execute(scene, hero) {
+        if (hero.body.onFloor()) {
+            // hop
+            if (hero.gamepad.A) {
+                this.stateMachine.transition('jump');
+            } else {
+                if (!hero.hasJumped && !hero.canDoubleJump) {
+                    hero.landing = 'hard';
+                }
+                this.stateMachine.transition('land');
+            }
+        }
         if (!hero.gamepad.A && hero.hasJumped && !hero.canDoubleJump) {
             hero.canDoubleJump = true;
         } else if (hero.gamepad.A && hero.canDoubleJump) {
@@ -282,18 +299,11 @@ class JumpState extends State {
 
         if (inputAxis < -1 * controllerThreshold) {
             hero.setFlipX(true);
-            hero.body.setVelocityX(-175);
+            hero.body.setVelocityX(175 * inputAxis);
         }
         if (inputAxis > controllerThreshold) {
             hero.setFlipX(false);
-            hero.body.setVelocityX(175);
-        }
-
-        if (hero.body.onFloor()) {
-            if (!hero.hasJumped && !hero.canDoubleJump) {
-                hero.landing = 'hard';
-            }
-            this.stateMachine.transition('land');
+            hero.body.setVelocityX(175 * inputAxis);
         }
     }
 }
