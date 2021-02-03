@@ -27,6 +27,9 @@ class BootScene extends Phaser.Scene {
             this.input.gamepad.once('connected', () => {
                 this.scene.start('GameScene');
             });
+            this.input.keyboard.on('keydown', (event) => {
+                this.scene.start('GameScene');
+            });
         });
 
         this.load.image('tiles', 'assets/Multi_Platformer_Tileset_v2/GrassLand/Terrain/Grassland_Terrain_Tileset.png');
