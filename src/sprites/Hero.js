@@ -1,4 +1,5 @@
 import * as StateMachine from '../helpers/StateMachine.hero';
+import InputMap from '../helpers/InputMap';
 
 /**
  * @this {Phaser.GameObjects.Sprite}
@@ -35,7 +36,10 @@ export default class Hero extends Phaser.GameObjects.Sprite {
 
         this.canDoubleJump = false;
 
-        this.leftAxis = this.gamepad._HAxisLeft;
+        /**
+         * @todo should this be in input map?
+         */
+        this.leftAxis = this.gamepad?._HAxisLeft;
 
         // The state machine managing the hero
         this.stateMachine = new StateMachine.StateMachine('jump', {
@@ -44,7 +48,7 @@ export default class Hero extends Phaser.GameObjects.Sprite {
             crouch: new StateMachine.CrouchState(),
             jump: new StateMachine.JumpState(),
             doubleJump: new StateMachine.DoubleJumpState(),
-            slide: new StateMachine.SlideState({ inputAxisValue: this.leftAxis.value }),
+            slide: new StateMachine.SlideState({ inputAxisValue: this.leftAxis?.value }),
             land: new StateMachine.LandingState()
         }, [this.scene, this]);
 
@@ -58,6 +62,8 @@ export default class Hero extends Phaser.GameObjects.Sprite {
             dec: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
             inc: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O)
         };
+
+        this.input = new InputMap(this, this.scene);
     }
 
     update(time, delta) {
