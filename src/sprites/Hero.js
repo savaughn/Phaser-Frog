@@ -1,5 +1,6 @@
-import * as StateMachine from '../helpers/StateMachine.hero';
+import StateMachine, * as States from '../helpers/StateMachine.hero';
 import InputMap from '../helpers/InputMap';
+import StateMachineGenerator from '../helpers/StateMachineGenerator';
 
 /**
  * @this {Phaser.GameObjects.Sprite}
@@ -12,12 +13,11 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         super(config.scene, config.x, config.y, config.key);
         config.scene.physics.world.enable(this);
         config.scene.add.existing(this);
-        this.body.setBoundsRectangle(Phaser.Geom.Rectangle.FromXY(740, 0, 1075, 1000));
+        // this.body.setBoundsRectangle(Phaser.Geom.Rectangle.FromXY(740, 0, 1075, 1000));
         this.body.collideWorldBounds = true;
 
         this.scene = config.scene;
         this.gamepad = myGamepad;
-        // this.armed = false;
         this.lock = false;
         this.canSlideBoost = true;
         this.slideCooldown = 3;
@@ -36,34 +36,8 @@ export default class Hero extends Phaser.GameObjects.Sprite {
 
         this.canDoubleJump = false;
 
-        /**
-         * @todo should this be in input map?
-         */
-        this.leftAxis = this.gamepad?._HAxisLeft;
-
-        // The state machine managing the hero
-        this.stateMachine = new StateMachine.StateMachine('jump', {
-            idle: new StateMachine.IdleState(),
-            move: new StateMachine.MoveState(),
-            crouch: new StateMachine.CrouchState(),
-            jump: new StateMachine.JumpState(),
-            doubleJump: new StateMachine.DoubleJumpState(),
-            slide: new StateMachine.SlideState({ inputAxisValue: this.leftAxis?.value }),
-            land: new StateMachine.LandingState()
-        }, [this.scene, this]);
-
-        this.keys = {
-            jump: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP),
-            jump2: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
-            fire: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z),
-            left: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT),
-            right: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT),
-            down: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN),
-            dec: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
-            inc: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O)
-        };
-
         this.input = new InputMap(this, this.scene);
+        this.stateMachine = StateMachineGenerator(this, 'hero');
     }
 
     update(time, delta) {
