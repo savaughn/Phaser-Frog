@@ -34,7 +34,7 @@ class BootScene extends Phaser.Scene {
 
         this.load.image('tiles', 'assets/Multi_Platformer_Tileset_v2/GrassLand/Terrain/Grassland_Terrain_Tileset.png');
         // Tilemap with a lot of objects and tile-properties tricks
-        this.load.tilemapTiledJSON('map', 'assets/tilemaps/level1.json');
+        this.load.tilemapTiledJSON('map', 'assets/tilemaps/world1.json');
 
         this.load.spritesheet('player-idle', 'assets/Lifter Asset Pack/1.Sprite/1.Player/shorthair/Skin1/shortplayer_idle.png', {
             frameWidth: 32, frameHeight: 32
