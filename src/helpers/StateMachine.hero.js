@@ -31,23 +31,6 @@ export default class StateMachine {
             this.possibleStates[this.state].enter(this.scene, this.hero);
         }
 
-        // Get right stick value
-        // inputAxis = this.hero.leftAxis?.value;
-        /**
-         * @todo am I reading inputAxis multiple times per frame now
-         */
-        // if (this.hero.input.moveLeft()) { isFacingLeft = true; }
-        // if (this.hero.input.moveRight()) { isFacingLeft = false; }
-
-        // if (this.hero.gamepad?.L2) {
-        //     timeout -= 100;
-        //     console.log(timeout);
-        // }
-        // if (this.hero.gamepad?.R2) {
-        //     timeout += 100;
-        //     console.log(timeout);
-        // }
-
         // if (this.hero.gamepad?.up) {
         //     Logger.toggleLoggingOn();
         // }
