@@ -1,8 +1,6 @@
 import * as Logger from './log';
 
 let inputAxis = 0;
-let isFacingLeft = false;
-const controllerThreshold = 0.6;
 
 export default class StateMachine {
     constructor(initialState, possibleStates, sprite) {
@@ -13,7 +11,6 @@ export default class StateMachine {
         this.scene = sprite.scene;
         this.hero.canDoubleJump = false;
         this.hero.hasJumped = false;
-        isFacingLeft = this.hero.isFacingLeft;
 
         // State instances get access to the state machine via this.stateMachine.
         for (const state of Object.values(this.possibleStates)) {
@@ -39,8 +36,8 @@ export default class StateMachine {
         /**
          * @todo am I reading inputAxis multiple times per frame now
          */
-        if (this.hero.input.moveLeft()) { isFacingLeft = true; }
-        if (this.hero.input.moveRight()) { isFacingLeft = false; }
+        // if (this.hero.input.moveLeft()) { isFacingLeft = true; }
+        // if (this.hero.input.moveRight()) { isFacingLeft = false; }
 
         // if (this.hero.gamepad?.L2) {
         //     timeout -= 100;
@@ -94,6 +91,10 @@ class IdleState extends State {
             hero.anims.play('idle');
         }
         hero.removeAllListeners();
+        // Disable hoping action
+        if (hero.input.jump()) {
+            hero.canJump = false;
+        } 
     }
 
     /**
@@ -102,18 +103,22 @@ class IdleState extends State {
      * @param {Phaser.GameObjects.Sprite} hero
      */
     execute(scene, hero) {
+        // Read Jump button released
+        if (!hero.canJump && !hero.input.jump()) {
+            hero.canJump = true;
+        }
         // Transition to crouch if pressing down
         if (hero.input.crouch()) {
             this.stateMachine.transition('crouch');
         }
 
-        if (hero.input.jump()) {
+        if (hero.canJump && hero.input.jump()) {
             this.stateMachine.transition('jump');
         }
 
         if (hero.input.moveLeft() || hero.input.moveRight()) {
             this.stateMachine.transition('move');
-        } 
+        }
     }
 }
 
@@ -137,10 +142,6 @@ class CrouchState extends State {
             } else {
                 hero.body.setVelocityX(0);
             }
-        }
-
-        if (hero.input.jump()) {
-            this.stateMachine.transition('jump');
         }
 
         if (!hero.input.crouch() && this.canStand) {
@@ -170,7 +171,7 @@ class MoveState extends State {
      */
     execute(scene, hero) {
         hero.body.setVelocityX(hero.input.getMoveValue() * 175);
-        hero.setFlipX(isFacingLeft);
+        hero.setFlipX(hero.isFacingLeft);
 
         if (hero.input.crouch() && hero.canSlide) {
             hero.anims.stop();
@@ -272,21 +273,14 @@ class JumpState extends State {
      */
     execute(scene, hero) {
         if (hero.body.onFloor()) {
-            // hop
-            // if (hero.input.jump()) {
-                // this.stateMachine.transition('jump');
-            // } else {
-                if (hero.input.crouch() && hero.body.velocity.x !== 0) {
-                    // hero.body.setVelocityX(hero.input.getMoveValue() * 175)
-                    this.stateMachine.transition('slide');
-                } else if (!hero.hasJumped && !hero.canDoubleJump) {
-                    hero.landing = 'hard';
-                    this.stateMachine.transition('land');
-                } else {
-                    this.stateMachine.transition('land');
-                } 
-                
-            // }
+            if (hero.input.crouch() && hero.body.velocity.x !== 0) {
+                this.stateMachine.transition('slide');
+            } else if (!hero.hasJumped && !hero.canDoubleJump) {
+                hero.landing = 'hard';
+                this.stateMachine.transition('land');
+            } else {
+                this.stateMachine.transition('land');
+            }    
         }
 
         if (!hero.input.jump() && hero.hasJumped && !hero.canDoubleJump) {

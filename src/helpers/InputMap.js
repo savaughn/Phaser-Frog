@@ -62,12 +62,14 @@ export default class InputMap {
     moveLeft() {
         if (this.gamepad.moveAxis?.value < -1 * controllerThreshold) {
             activeInputSource = 'gamepad';
+            this.hero.isFacingLeft = true;
             return true;
         }
 
         if (this.keyboard.moveLeft.isDown || this.gamepad?.moveLeft?.pressed) {
             activeInputSource = 'keyboard';
             arrowAxis = -1;
+            this.hero.isFacingLeft = true;
             return true;
         }
         return false;
@@ -76,12 +78,14 @@ export default class InputMap {
     moveRight() {
         if (this.gamepad.moveAxis?.value > controllerThreshold) {
             activeInputSource = 'gamepad';
+            this.hero.isFacingLeft = false;
             return true;
         }
         
         if (this.keyboard.moveRight.isDown ||  this.gamepad?.moveRight?.pressed) {
             activeInputSource = 'keyboard';
             arrowAxis = 1;
+            this.hero.isFacingLeft = false;
             return true;
         }
         return false;

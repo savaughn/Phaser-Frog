@@ -33,7 +33,7 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.jumpVelocity = -350;
         this.landing = 'soft';
         this.isFacingLeft = false;
-
+        this.canJump = true;
         this.canDoubleJump = false;
 
         this.input = new InputMap(this, this.scene);
