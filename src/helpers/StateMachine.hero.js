@@ -1,6 +1,8 @@
 import * as Logger from './log';
 
 let inputAxis = 0;
+let accel = 0.15;
+let targetSpeed = 175;
 
 export default class StateMachine {
     constructor(initialState, possibleStates, sprite) {
@@ -21,6 +23,8 @@ export default class StateMachine {
         //     console.log(anim.key + ' complete');
         //     this.hero.emit('animation')
         // });
+        var txt = this.scene.add.text(300, 500, 'hello', { fontFamily: 'Arial', fontSize: 64, color: '#00ff00' });
+
     }
 
     step() {
@@ -31,13 +35,15 @@ export default class StateMachine {
             this.possibleStates[this.state].enter(this.scene, this.hero);
         }
 
-        // if (this.hero.gamepad?.up) {
-        //     Logger.toggleLoggingOn();
-        // }
+        if (accel !== 1 && this.hero.gamepad?.up) {
+            accel = Phaser.Math.Clamp(accel + 0.01, 0.01, 1);
+            console.log(accel);
+        }
 
-        // if (this.hero.gamepad?.down) {
-        //     Logger.toggleLoggingOff();
-        // }
+        if (accel !== 0.01 && this.hero.gamepad?.down) {
+            accel = Phaser.Math.Clamp(accel - 0.01, 0.01, 1);
+            console.log(accel);
+        }
 
         // Run the current state's execute
         this.possibleStates[this.state].execute(this.scene, this.hero);
@@ -136,38 +142,44 @@ class CrouchState extends State {
 }
 
 class MoveState extends State {
-    /**
-     *
-     * @param {Phaser.Scene} scene
-     * @param {Phaser.GameObjects.Sprite} hero
-     */
-    enter(scene, hero) {
-        // stops running anim on hop
-        if (hero.body.onFloor() && !hero.input.jump()) {
-            hero.anims.play('run');
+    getSpriteVelocityWithAcceleration(hero) {
+        if (hero.body.velocity.x < -174 || hero.body.velocity.x > 174) {
+            return targetSpeed * (hero.isFacingLeft ? -1 : 1);
+        } else {
+            return hero.input.getMoveValue() * accel * targetSpeed + (1 - accel) * hero.body.velocity.x;
         }
     }
-
+    
     /**
-     * 
-     * @todo accel to 175 
+     * @param {Phaser.GameObjects.Sprite} hero
      */
     execute(scene, hero) {
-        hero.body.setVelocityX(hero.input.getMoveValue() * 175);
+        let _velocity = this.getSpriteVelocityWithAcceleration(hero);
+        hero.body.setVelocityX(_velocity);
         hero.setFlipX(hero.isFacingLeft);
+
+        let frameRate = Phaser.Math.Clamp(Math.abs(hero.body.velocity.x) / targetSpeed, 0.3, 1);
+
+        if (hero.body.onFloor() && !hero.input.jump()) {
+            hero.anims.play({ key: 'run', startFrame: 5}, true);
+            hero.anims.timeScale = frameRate;
+        }
 
         if (hero.input.crouch() && hero.canSlide) {
             hero.anims.stop();
+            hero.anims.timeScale = 1;
             this.stateMachine.transition('slide');
         }
 
         if (hero.input.jump()) {
             hero.anims.stop();
+            hero.anims.timeScale = 1;
             this.stateMachine.transition('jump');
         }
 
         // Transition to idle if not pressing movement keys
         if (!hero.input.moveLeft() && !hero.input.moveRight()) {
+            hero.anims.timeScale = 1;
             hero.anims.stop();
             this.stateMachine.transition('idle');
         }
