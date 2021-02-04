@@ -15,8 +15,8 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         config.scene.add.existing(this);
         // this.body.setBoundsRectangle(Phaser.Geom.Rectangle.FromXY(740, 0, 1075, 1000));
         this.body.collideWorldBounds = true;
-        this.body.width = 16;
-        this.body.offset.x = 8;
+        this.body.width = 6;
+        this.body.offset.x = 14;
 
         this.scene = config.scene;
         this.gamepad = myGamepad;
