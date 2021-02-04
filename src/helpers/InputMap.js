@@ -44,7 +44,7 @@ export default class InputMap {
     }
 
     jump() {
-        if (this.keyboard.jump.isDown || this.gamepad.jump.pressed) {
+        if (this.keyboard.jump.isDown || this.gamepad.jump?.pressed) {
             return true;
         }
 
@@ -52,7 +52,7 @@ export default class InputMap {
     }
 
     crouch() {
-        if (this.keyboard.crouch.isDown || this.gamepad.crouch.pressed) {
+        if (this.keyboard.crouch.isDown || this.gamepad.crouch?.pressed) {
             return true;
         }
 
@@ -65,7 +65,7 @@ export default class InputMap {
             return true;
         }
 
-        if (this.keyboard.moveLeft.isDown || this.gamepad?.moveLeft.pressed) {
+        if (this.keyboard.moveLeft.isDown || this.gamepad?.moveLeft?.pressed) {
             activeInputSource = 'keyboard';
             arrowAxis = -1;
             return true;
@@ -79,7 +79,7 @@ export default class InputMap {
             return true;
         }
         
-        if (this.keyboard.moveRight.isDown ||  this.gamepad?.moveRight.pressed) {
+        if (this.keyboard.moveRight.isDown ||  this.gamepad?.moveRight?.pressed) {
             activeInputSource = 'keyboard';
             arrowAxis = 1;
             return true;
