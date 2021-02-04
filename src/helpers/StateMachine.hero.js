@@ -100,7 +100,7 @@ class IdleState extends State {
             this.stateMachine.transition('crouch');
         }
 
-        if (hero.canJump && hero.input.jump()) {
+        if ((hero.canJump && hero.input.jump()) || !hero.body.onFloor()) {
             this.stateMachine.transition('jump');
         }
 
