@@ -1,8 +1,9 @@
 import * as Logger from './log';
 
 let inputAxis = 0;
-let accel = 0.15;
-let targetSpeed = 175;
+let accel = 0.1;
+const targetSpeed = 175;
+const initialVelocity = 10;
 
 export default class StateMachine {
     constructor(initialState, possibleStates, sprite) {
@@ -23,8 +24,6 @@ export default class StateMachine {
         //     console.log(anim.key + ' complete');
         //     this.hero.emit('animation')
         // });
-        var txt = this.scene.add.text(300, 500, 'hello', { fontFamily: 'Arial', fontSize: 64, color: '#00ff00' });
-
     }
 
     step() {
@@ -149,20 +148,35 @@ class MoveState extends State {
             return hero.input.getMoveValue() * accel * targetSpeed + (1 - accel) * hero.body.velocity.x;
         }
     }
+
+    getIsSpriteBlocked(sprite) {
+        if (sprite.isFacingLeft) {
+            return sprite.body.blocked.left;
+        } else {
+            return sprite.body.blocked.right;
+        }
+    }
+
+    enter(scene, hero) {
+        hero.body.setVelocityX(initialVelocity * (hero.isFacingLeft ? -1 : 1));
+    }
     
     /**
      * @param {Phaser.GameObjects.Sprite} hero
      */
     execute(scene, hero) {
         let _velocity = this.getSpriteVelocityWithAcceleration(hero);
-        hero.body.setVelocityX(_velocity);
-        hero.setFlipX(hero.isFacingLeft);
-
         let frameRate = Phaser.Math.Clamp(Math.abs(hero.body.velocity.x) / targetSpeed, 0.3, 1);
 
         if (hero.body.onFloor() && !hero.input.jump()) {
-            hero.anims.play({ key: 'run', startFrame: 5}, true);
-            hero.anims.timeScale = frameRate;
+            hero.setFlipX(hero.isFacingLeft);
+            hero.body.setVelocityX(_velocity);
+            if(this.getIsSpriteBlocked(hero)) {
+                hero.anims.play('idle', true);
+            } else {
+                hero.anims.timeScale = frameRate;
+                hero.anims.play({ key: 'run', startFrame: 5}, true);
+            }
         }
 
         if (hero.input.crouch() && hero.canSlide) {
