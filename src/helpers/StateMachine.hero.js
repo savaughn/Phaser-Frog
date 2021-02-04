@@ -4,13 +4,13 @@ let inputAxis = 0;
 let isFacingLeft = false;
 const controllerThreshold = 0.6;
 
-class StateMachine {
-    constructor(initialState, possibleStates, stateArgs = []) {
+export default class StateMachine {
+    constructor(initialState, possibleStates, sprite) {
         this.initialState = initialState;
         this.possibleStates = possibleStates;
-        this.stateArgs = stateArgs;
         this.state = null;
-        this.hero = this.stateArgs[1];
+        this.hero = sprite;
+        this.scene = sprite.scene;
         this.hero.canDoubleJump = false;
         this.hero.hasJumped = false;
         isFacingLeft = this.hero.isFacingLeft;
@@ -31,7 +31,7 @@ class StateMachine {
         if (this.state === null) {
             this.state = this.initialState;
             console.log(this.initialState);
-            this.possibleStates[this.state].enter(...this.stateArgs);
+            this.possibleStates[this.state].enter(this.scene, this.hero);
         }
 
         // Get right stick value
@@ -51,22 +51,22 @@ class StateMachine {
         //     console.log(timeout);
         // }
 
-        if (this.hero.gamepad?.up) {
-            Logger.toggleLoggingOn();
-        }
+        // if (this.hero.gamepad?.up) {
+        //     Logger.toggleLoggingOn();
+        // }
 
-        if (this.hero.gamepad?.down) {
-            Logger.toggleLoggingOff();
-        }
+        // if (this.hero.gamepad?.down) {
+        //     Logger.toggleLoggingOff();
+        // }
 
         // Run the current state's execute
-        this.possibleStates[this.state].execute(...this.stateArgs);
+        this.possibleStates[this.state].execute(this.scene, this.hero);
     }
 
     transition(newState, ...enterArgs) {
         Logger.log(newState);
         this.state = newState;
-        this.possibleStates[this.state].enter(...this.stateArgs, ...enterArgs);
+        this.possibleStates[this.state].enter(this.scene, this.hero, ...enterArgs);
     }
 }
 
@@ -164,8 +164,12 @@ class MoveState extends State {
         }
     }
 
+    /**
+     * 
+     * @todo accel to 175 
+     */
     execute(scene, hero) {
-        hero.body.setVelocityX(hero.input.getLeftAxis() * 175);
+        hero.body.setVelocityX(hero.input.getMoveValue() * 175);
         hero.setFlipX(isFacingLeft);
 
         if (hero.input.crouch() && hero.canSlide) {
@@ -269,15 +273,20 @@ class JumpState extends State {
     execute(scene, hero) {
         if (hero.body.onFloor()) {
             // hop
-            // if (hero.gamepad?.A) {
-            if (hero.input.jump()) {
-                this.stateMachine.transition('jump');
-            } else {
-                if (!hero.hasJumped && !hero.canDoubleJump) {
+            // if (hero.input.jump()) {
+                // this.stateMachine.transition('jump');
+            // } else {
+                if (hero.input.crouch() && hero.body.velocity.x !== 0) {
+                    // hero.body.setVelocityX(hero.input.getMoveValue() * 175)
+                    this.stateMachine.transition('slide');
+                } else if (!hero.hasJumped && !hero.canDoubleJump) {
                     hero.landing = 'hard';
-                }
-                this.stateMachine.transition('land');
-            }
+                    this.stateMachine.transition('land');
+                } else {
+                    this.stateMachine.transition('land');
+                } 
+                
+            // }
         }
 
         if (!hero.input.jump() && hero.hasJumped && !hero.canDoubleJump) {
@@ -293,11 +302,11 @@ class JumpState extends State {
 
         if (hero.input.moveLeft()) {
             hero.setFlipX(true);
-            hero.body.setVelocityX(175 * hero.input.getLeftAxis());
+            hero.body.setVelocityX(175 * hero.input.getMoveValue());
         }
         if (hero.input.moveRight()) {
             hero.setFlipX(false);
-            hero.body.setVelocityX(175 * hero.input.getLeftAxis());
+            hero.body.setVelocityX(175 * hero.input.getMoveValue());
         }
     }
 }
@@ -339,5 +348,5 @@ class LandingState extends State {
 }
 
 export {
-    StateMachine, CrouchState, IdleState, MoveState, JumpState, DoubleJumpState, SlideState, LandingState
+    CrouchState, IdleState, MoveState, JumpState, DoubleJumpState, SlideState, LandingState
 };
