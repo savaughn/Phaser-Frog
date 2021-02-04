@@ -14,7 +14,7 @@ class GameScene extends Phaser.Scene {
         this.hero = new Hero({
             scene: this,
             key: 'hero',
-            x: 700,
+            x: 750,
             y: 750
         },
         this.input.gamepad?.getPad(0)
