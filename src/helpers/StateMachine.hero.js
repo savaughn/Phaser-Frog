@@ -44,6 +44,14 @@ export default class StateMachine {
             console.log(accel);
         }
 
+        if (this.hero.gamepad?.buttons[4].pressed) {
+            console.log(this.hero.body.velocity);
+        }
+
+        if (this.hero.gamepad?.buttons[5].pressed) {
+            console.log(this.hero.body.position);
+        }
+
         // Run the current state's execute
         this.possibleStates[this.state].execute(this.scene, this.hero);
     }
@@ -100,7 +108,7 @@ class IdleState extends State {
             this.stateMachine.transition('crouch');
         }
 
-        if ((hero.canJump && hero.input.jump()) || !hero.body.onFloor()) {
+        if (hero.canJump && hero.input.jump()) {
             this.stateMachine.transition('jump');
         }
 
@@ -137,10 +145,20 @@ class CrouchState extends State {
             this.canStand = false;
             this.stateMachine.transition('idle');
         }
+
+        if (!hero.body.onFloor()) {
+            this.stateMachine.transition('jump');
+        }
     }
 }
 
 class MoveState extends State {
+    transitionSpriteFromMoving(sprite, state) {
+        sprite.anims.stop();
+        sprite.anims.timeScale = 1;
+        this.stateMachine.transition(state.toString());
+    }
+
     getSpriteVelocityWithAcceleration(hero) {
         if (hero.body.velocity.x < -174 || hero.body.velocity.x > 174) {
             return targetSpeed * (hero.isFacingLeft ? -1 : 1);
@@ -180,15 +198,7 @@ class MoveState extends State {
         }
 
         if (hero.input.crouch() && hero.canSlide) {
-            hero.anims.stop();
-            hero.anims.timeScale = 1;
-            this.stateMachine.transition('slide');
-        }
-
-        if (hero.input.jump()) {
-            hero.anims.stop();
-            hero.anims.timeScale = 1;
-            this.stateMachine.transition('jump');
+            this.transitionSpriteFromMoving(hero, 'slide');
         }
 
         // Transition to idle if not pressing movement keys
@@ -196,6 +206,11 @@ class MoveState extends State {
             hero.anims.timeScale = 1;
             hero.anims.stop();
             this.stateMachine.transition('idle');
+        }
+
+        // TODO: Stop hoping here
+        if (hero.input.jump() || !hero.body.onFloor()) {
+            this.transitionSpriteFromMoving(hero, 'jump')
         }
     }
 }
@@ -253,10 +268,19 @@ class SlideState extends State {
             hero.anims.stop();
             this.stateMachine.transition('crouch');
         }
+
+        if (!hero.body.onFloor()) {
+            this.stateMachine.transition('jump');
+        }
     }
 }
 
 class JumpState extends State {
+    setSpriteGravity(sprite, value) {
+        if(sprite.body.gravity.y !== value) {
+            sprite.body.setGravityY(value);
+        }
+    }
     /**
      *
      * @param {Phaser.Scene} scene
@@ -281,8 +305,13 @@ class JumpState extends State {
      * @param {Phaser.GameObjects.Sprite} hero
      */
     execute(scene, hero) {
+        const impulse = 0.8;
+        const airConThreshold = 50;
+        const addAirV = 100;
+        // On the ground
         if (hero.body.onFloor()) {
-            if (hero.input.crouch() && hero.body.velocity.x !== 0) {
+            this.setSpriteGravity(hero, 0);
+            if (hero.body.velocity.x !== 0 && hero.input.crouch()) {
                 this.stateMachine.transition('slide');
             } else if (!hero.hasJumped && !hero.canDoubleJump) {
                 hero.landing = 'hard';
@@ -290,26 +319,37 @@ class JumpState extends State {
             } else {
                 this.stateMachine.transition('land');
             }    
-        }
+        } else {
+            // In the air
+            if (hero.hasJumped && !hero.canDoubleJump && !hero.input.jump()) {
+                hero.body.setVelocityY(hero.body.velocity.y * 0.5);
+                hero.canDoubleJump = true;
+            } else if (hero.canDoubleJump && hero.input.jump()) {
+                this.setSpriteGravity(hero, 0);
+                this.stateMachine.transition('doubleJump');
+            }
 
-        if (!hero.input.jump() && hero.hasJumped && !hero.canDoubleJump) {
-            hero.canDoubleJump = true;
-        } else if (hero.input.jump() && hero.canDoubleJump) {
-            this.stateMachine.transition('doubleJump');
-        }
+            if (hero.body.velocity.y > 0) {
+                hero.landing = 'soft';
+                //          regular jump                                double jump
+                if (hero.anims.currentAnim?.key === 'jump-up' || hero.anims.currentAnim?.key === 'roll') {
+                    this.setSpriteGravity(hero, 1000);
+                }
+                hero.anims.play('jump-down');
+            }
 
-        if (hero.body.velocity.y > 0) {
-            hero.landing = 'soft';
-            hero.anims.play('jump-down');
-        }
-
-        if (hero.input.moveLeft()) {
-            hero.setFlipX(true);
-            hero.body.setVelocityX(175 * hero.input.getMoveValue());
-        }
-        if (hero.input.moveRight()) {
-            hero.setFlipX(false);
-            hero.body.setVelocityX(175 * hero.input.getMoveValue());
+            // TODO: make this aircontrol better
+            if (hero.input.moveLeft() && hero.body.velocity.x >= 0) {
+                hero.setFlipX(true);
+                this.setSpriteGravity(hero, 0);
+                let _velocity = (hero.body.velocity.x !== 0 ? hero.body.velocity.x : addAirV) * -impulse;
+                hero.body.setVelocityX(_velocity);
+            } else if (hero.input.moveRight() && hero.body.velocity.x <= 0) {
+                hero.setFlipX(false);
+                this.setSpriteGravity(hero, 0);
+                let _velocity = (hero.body.velocity.x !== 0 ? hero.body.velocity.x : -addAirV) * -impulse;
+                hero.body.setVelocityX(_velocity);
+            }
         }
     }
 }

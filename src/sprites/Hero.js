@@ -1,4 +1,3 @@
-import StateMachine, * as States from '../helpers/StateMachine.hero';
 import InputMap from '../helpers/InputMap';
 import StateMachineGenerator from '../helpers/StateMachineGenerator';
 
@@ -13,7 +12,6 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         super(config.scene, config.x, config.y, config.key);
         config.scene.physics.world.enable(this);
         config.scene.add.existing(this);
-        // this.body.setBoundsRectangle(Phaser.Geom.Rectangle.FromXY(740, 0, 1075, 1000));
         this.body.collideWorldBounds = true;
         this.body.width = 6;
         this.body.offset.x = 14;
@@ -37,6 +35,9 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.isFacingLeft = false;
         this.canJump = true;
         this.canDoubleJump = false;
+
+        // Physics
+        this.body.setMaxVelocityY(500);
 
         this.input = new InputMap(this, this.scene);
         this.stateMachine = StateMachineGenerator(this, 'hero');
