@@ -176,7 +176,9 @@ class MoveState extends State {
     }
 
     enter(scene, hero) {
-        hero.body.setVelocityX(initialVelocity * (hero.isFacingLeft ? -1 : 1));
+        if (hero.body.velocity.x === 0) {
+            hero.body.setVelocityX(initialVelocity * (hero.isFacingLeft ? -1 : 1));
+        }
     }
     
     /**
@@ -313,6 +315,8 @@ class JumpState extends State {
             this.setSpriteGravity(hero, 0);
             if (hero.body.velocity.x !== 0 && hero.input.crouch()) {
                 this.stateMachine.transition('slide');
+            } else if (hero.input.moveLeft() || hero.input.moveRight()) {
+                this.stateMachine.transition('move');
             } else if (!hero.hasJumped && !hero.canDoubleJump) {
                 hero.landing = 'hard';
                 this.stateMachine.transition('land');
@@ -376,16 +380,21 @@ class LandingState extends State {
      */
     enter(scene, hero) {
         hero.once('animationcomplete-hard-land', anim => {
-            // hero.removeAllListeners('animationcomplete-hard-land');
             this.stateMachine.transition('idle');
         });
     }
+
     execute(scene, hero) {
-        if (hero.landing === 'soft') {
-            this.stateMachine.transition('crouch');
+        if (hero.input.moveLeft() || hero.input.moveRight()) {
+            hero.anims.stop();
+            this.stateMachine.transition('move');
         } else {
-            hero.body.setVelocityX(0);
-            hero.anims.play('hard-land', true);
+            if (hero.landing === 'soft') {
+                this.stateMachine.transition('crouch');
+            } else {
+                hero.body.setVelocityX(0);
+                hero.anims.play('hard-land', true);
+            }
         }
     }
 }
