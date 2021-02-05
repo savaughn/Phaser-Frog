@@ -2,7 +2,7 @@ import StateMachine, * as States from './StateMachine.hero';
 
 export default function(sprite, type) {
     if (type === 'hero') {
-        return new StateMachine('jump', {
+        return new StateMachine('idle', {
             idle: new States.IdleState(),
             move: new States.MoveState(),
             crouch: new States.CrouchState(),
