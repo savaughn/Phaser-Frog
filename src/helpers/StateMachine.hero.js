@@ -138,7 +138,7 @@ class CrouchState extends State {
         // Slow crouching sprite with velocity
         if (hero.body.velocity.x !== 0) {
             if (hero.body.velocity.x > 0.1 || hero.body.velocity.x < -0.1) {
-                hero.body.setVelocityX(hero.body.velocity.x / 1.35);
+                hero.body.setVelocityX(hero.body.velocity.x / 10);
             } else {
                 hero.body.setVelocityX(0);
             }
@@ -148,6 +148,10 @@ class CrouchState extends State {
             hero.anims.stop();
             hero.canStand = false;
             this.stateMachine.transition('idle');
+        }
+
+        if (!hero.body.onFloor()) {
+            this.stateMachine.transition('jump');
         }
     }
 }

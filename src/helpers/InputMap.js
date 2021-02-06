@@ -59,6 +59,9 @@ export default class InputMap {
         return false;
     }
 
+    /**
+     * @todo sometimes doesn't change facing direction
+     */
     moveLeft() {
         if (this.gamepad.moveAxis?.value < -1 * controllerThreshold) {
             activeInputSource = 'gamepad';
