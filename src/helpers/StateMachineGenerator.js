@@ -8,7 +8,7 @@ export default function(sprite, type) {
             crouch: new States.CrouchState(),
             jump: new States.JumpState(),
             doubleJump: new States.DoubleJumpState(),
-            slide: new States.SlideState({ inputAxisValue: sprite.leftAxis?.value }),
+            slide: new States.SlideState(),
             land: new States.LandingState()
         }, sprite);
     }

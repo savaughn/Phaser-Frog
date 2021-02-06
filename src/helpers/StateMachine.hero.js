@@ -226,21 +226,14 @@ class MoveState extends State {
 }
 
 class SlideState extends State {
-    constructor({
-        inputAxisValue
-    }) {
-        super();
-        this.currentAxis = inputAxisValue;
+    transitionSpriteFromSliding(sprite, targetState){
+        sprite.forceSlide = true;
+        sprite.anims.stop();
+        this.stateMachine.transition(targetState);
     }
-    startCooldown(scene, hero) {
-        hero.slideTimer = scene.time.addEvent({
-            delay: 250,
-            callback: () => {
-                hero.canSlide = true;
-            }
-        });
-    }
+
     enter(scene, hero) {
+        hero.forceSlide = true;
         hero.anims.stop();
         hero.anims.play('slide', false);
         hero.forceTimer = scene.time.addEvent({
@@ -249,7 +242,6 @@ class SlideState extends State {
                 hero.forceSlide = false;
             }
         });
-        this.currentAxis = inputAxis;
     }
     execute(scene, hero) {
         // slow moving sprite
@@ -258,29 +250,19 @@ class SlideState extends State {
         if (((hero.body.velocity.x > 0 && hero.body.velocity.x < 80) ||
         (hero.body.velocity.x < 0 && hero.body.velocity.x > -80)) &&
         !hero.forceSlide) {
-            hero.canSlide = false;
-            this.startCooldown(scene, hero);
-            hero.forceSlide = true;
-            hero.anims.stop();
-            this.stateMachine.transition('crouch');
+            this.transitionSpriteFromSliding(hero, 'crouch');
         };
 
         if (!hero.input.crouch() && !hero.forceSlide) {
-            hero.canSlide = false;
-            this.startCooldown(scene, hero);
-            hero.forceSlide = true;
-            hero.anims.stop();
-            this.stateMachine.transition('idle');
+            this.transitionSpriteFromSliding(hero, 'idle');
         }
 
         if (hero.body.velocity.x === 0 && !hero.forceSlide) {
-            hero.forceSlide = true;
-            hero.anims.stop();
-            this.stateMachine.transition('crouch');
+            this.transitionSpriteFromSliding(hero, 'crouch');
         }
 
-        if (!hero.body.onFloor()) {
-            this.stateMachine.transition('jump');
+        if (!hero.body.onFloor() || hero.input.jump()) {
+            this.transitionSpriteFromSliding(hero, 'jump');
         }
     }
 }
