@@ -277,17 +277,17 @@ class JumpState extends State {
      *
      * @param {Phaser.Scene} scene
      * @param {Phaser.GameObjects.Sprite} hero
-     * @todo charge jump - check time button down. tap for short jump.
      * @todo crouch in jump
      */
 
     enter(scene, hero) {
-        if (hero.body.onFloor()) {
+        if (hero.body.onFloor() && hero.canJump) {
             hero.canDoubleJump = false;
             hero.hasJumped = true;
             hero.anims.stop();
             hero.body.setVelocityY(hero.jumpVelocity * hero.jumpForce);
             hero.anims.play('jump-up', true);
+            hero.canJump = false;
         }
     }
 
@@ -319,6 +319,7 @@ class JumpState extends State {
             if (hero.hasJumped && !hero.canDoubleJump && !hero.input.jump()) {
                 hero.body.setVelocityY(hero.body.velocity.y * 0.5);
                 hero.canDoubleJump = true;
+                hero.canJump = true;
             // Execute Double Jump 
             } else if (hero.canDoubleJump && hero.input.jump()) {
                 this.setSpriteGravity(hero, 0);
@@ -408,12 +409,11 @@ class LandingState extends State {
     }
 
     execute(scene, hero) {
-        // console.log(hero.canDoubleJump);
         // override landing animation on player input
         if (hero.input.moveLeft() || hero.input.moveRight()) {
             hero.anims.stop();
             this.stateMachine.transition('move');
-        } else if (hero.input.jump() && !hero.hasJumped && hero.canDoubleJump) {
+        } else if (hero.input.jump() && hero.canJump) {
             hero.anims.stop();
             this.stateMachine.transition('jump');
         } else {
