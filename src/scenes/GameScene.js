@@ -21,7 +21,7 @@ class GameScene extends Phaser.Scene {
 
         this.physics.add.collider(this.hero, this.platforms);
         this.cameras.main.setZoom(4);
-        this.cameras.main.startFollow(this.hero, true, 0.8, 0.0, 0, 0);
+        this.cameras.main.startFollow(this.hero, true, 0.8, 0.0, 0, 50);
     }
 
     update(time, delta) {
