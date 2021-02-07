@@ -53,6 +53,8 @@ export default class StateMachine {
             console.log(this.hero.body.position);
         }
 
+        this.hero.currentState = this.state;
+
         // Run the current state's execute
         this.possibleStates[this.state].execute(this.scene, this.hero);
     }
@@ -192,7 +194,7 @@ class MoveState extends State {
         let _velocity = this.getSpriteVelocityWithAcceleration(hero);
         let frameRate = Phaser.Math.Clamp(Math.abs(hero.body.velocity.x) / targetSpeed, 0.3, 1);
 
-        if (hero.body.onFloor() && !hero.input.jump()) {
+        if (hero.body.onFloor()) {
             hero.setFlipX(hero.isFacingLeft);
             hero.body.setVelocityX(_velocity);
             if(this.getIsSpriteBlocked(hero)) {
@@ -215,8 +217,12 @@ class MoveState extends State {
             this.stateMachine.transition('idle');
         }
 
+        if (!hero.canJump && !hero.input.jump()) {
+            hero.canJump = true;
+        }
+
         // Jump while moving
-        if (hero.input.jump() || !hero.body.onFloor()) {
+        if ((hero.input.jump() && hero.canJump) || !hero.body.onFloor()) {
             if ((hero.body.velocity.x < minJumpV && hero.body.velocity.x > -minJumpV) && hero.body.velocity.x !== 0) {
                 hero.body.setVelocityX(minJumpV * (hero.isFacingLeft ? -1 : 1));
             }
@@ -312,7 +318,7 @@ class JumpState extends State {
                 this.stateMachine.transition('land');
             } else {
                 this.stateMachine.transition('land');
-            }    
+            }
         } else {
             // In the air
             // Set double jump / end jump arc
@@ -362,6 +368,7 @@ class DoubleJumpState extends State {
     enter(scene, hero) {
         hero.canDoubleJump = false;
         hero.hasJumped = false;
+        hero.canJump = false;
         hero.body.setVelocityY(hero.jumpVelocity * 1.1);
         hero.anims.play('roll');
         hero.once('animationcomplete-roll', () => {
