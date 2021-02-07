@@ -37,6 +37,8 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.canDoubleJump = false;
         this.canStand = false;
 
+        this.currentState = 'idle';
+
         // Physics
         this.body.setMaxVelocityY(500);
 
