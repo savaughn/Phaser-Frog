@@ -9,12 +9,16 @@ import StateMachineGenerator from '../helpers/StateMachineGenerator';
 
 export default class Hero extends Phaser.GameObjects.Sprite {
     constructor(config, myGamepad) {
-        super(config.scene, config.x, config.y, config.key);
-        config.scene.physics.world.enable(this);
-        config.scene.add.existing(this);
-        this.body.collideWorldBounds = true;
-        this.body.width = 6;
-        this.body.offset.x = 14;
+        super(config.scene, config.x, config.y, config.key, config.enablePhysics);
+        if (config.enablePhysics) {
+            config.scene.physics.world.enable(this);
+            config.scene.add.existing(this);
+            this.body.collideWorldBounds = true;
+            // Physics
+            this.body.setMaxVelocityY(500);
+            this.body.width = 6;
+            this.body.offset.x = 14;
+        }
 
         this.scene = config.scene;
         this.gamepad = myGamepad;
@@ -38,9 +42,6 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.canStand = false;
 
         this.currentState = 'idle';
-
-        // Physics
-        this.body.setMaxVelocityY(500);
 
         this.input = new InputMap(this, this.scene);
         this.stateMachine = StateMachineGenerator(this, 'hero');

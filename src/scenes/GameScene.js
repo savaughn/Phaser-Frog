@@ -14,7 +14,8 @@ class GameScene extends Phaser.Scene {
             scene: this,
             key: 'hero',
             x: 1100,
-            y: 800
+            y: 800,
+            enablePhysics: true
         },
         this.input.gamepad?.getPad(0)
         );

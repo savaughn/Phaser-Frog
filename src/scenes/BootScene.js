@@ -1,24 +1,28 @@
 import makeAnimations from '../helpers/animations';
+import Hero from '../sprites/Hero';
 
 /**
  * @this {Phaser.Scene}
  */
 
 class BootScene extends Phaser.Scene {
-    constructor(test) {
+    constructor(config) {
         super({
             key: 'BootScene'
         });
+        this.hero = null;
+        this.animations = ['run', 'idle', 'idle'];
+        this.index = 0;
     }
     preload() {
-        const progress = this.add.graphics();
+        // const progress = this.add.graphics();
 
-        // Register a load progress event to show a load bar
-        this.load.on('progress', (value) => {
-            progress.clear();
-            progress.fillStyle(0xffffff, 1);
-            progress.fillRect(0, this.sys.game.config.height / 2, this.sys.game.config.width * value, 60);
-        });
+        // // Register a load progress event to show a load bar
+        // this.load.on('progress', (value) => {
+        //     progress.clear();
+        //     progress.fillStyle(0xffffff, 1);
+        //     progress.fillRect(0, this.sys.game.config.height / 2, this.sys.game.config.width * value, 60);
+        // });
 
         // Register a load complete event to launch the title screen when all files are loaded
         this.load.on('complete', () => {
@@ -28,7 +32,7 @@ class BootScene extends Phaser.Scene {
                 { fontSize: 64, fill: '#FFFFFF' }
             );
             makeAnimations(this);
-            progress.destroy();
+            // progress.destroy();
             this.input.gamepad.once('connected', () => {
                 this.scene.start('GameScene');
             });
@@ -56,6 +60,22 @@ class BootScene extends Phaser.Scene {
         this.load.spritesheet('player-slide', 'assets/Lifter Asset Pack/1.Sprite/1.Player/shorthair/Skin1/shortplayer_slider.png', {
             frameWidth: 32, frameHeight: 32
         });
+    }
+
+    create() {
+        this.hero = this.add.sprite(this.sys.game.config.width * .9, this.sys.game.config.height * .75, 'sprite');
+        this.hero.setScale(5);
+        this.hero.play('idle', true);
+    }
+
+    update(time) {
+        if (time % 2000 <= 20) {
+            this.index = (this.index + 1) % this.animations.length;
+            this.hero.play(this.animations[this.index], true);
+            if (this.index === this.animations.length - 1) {
+                this.hero.setFlipX(!this.hero.flipX);
+            }
+        }
     }
 }
 
