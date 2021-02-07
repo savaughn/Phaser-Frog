@@ -22,6 +22,11 @@ class BootScene extends Phaser.Scene {
 
         // Register a load complete event to launch the title screen when all files are loaded
         this.load.on('complete', () => {
+            this.add.text(this.sys.game.config.width *0.1, 
+                this.sys.game.config.height / 2, 
+                'Press any key or button on gamepad', 
+                { fontSize: 64, fill: '#FFFFFF' }
+            );
             makeAnimations(this);
             progress.destroy();
             this.input.gamepad.once('connected', () => {
