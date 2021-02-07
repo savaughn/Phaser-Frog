@@ -1,6 +1,8 @@
 import 'phaser';
 import BootScene from './scenes/BootScene';
 import GameScene from './scenes/GameScene';
+import UiScene from './scenes/UiScene';
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
 const config = {
     // For more settings see <https://github.com/photonstorm/phaser/blob/master/src/boot/Config.js>
@@ -30,9 +32,18 @@ const config = {
             debug: false
         }
     },
+    plugins: {
+        scene: [{
+                key: 'rexUI',
+                plugin: RexUIPlugin,
+                mapping: 'rexUI'
+            } 
+        ],
+      },
     scene: [
         BootScene,
-        GameScene
+        GameScene,
+        UiScene
     ]
 };
 
