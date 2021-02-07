@@ -348,8 +348,9 @@ class JumpState extends State {
                 hero.anims.play('jump-down');
             }
 
-            // TODO: make this aircontrol better
-            if (hero.input.moveLeft() && hero.body.velocity.x >= 0) {
+            if (hero.input.moveLeft() && hero.input.moveRight()) {
+                // do nothing
+            } else if (hero.input.moveLeft() && hero.body.velocity.x >= 0) {
                 hero.setFlipX(true);
                 this.setSpriteGravity(hero, 0);
                 let _velocity = (hero.body.velocity.x !== 0 ? hero.body.velocity.x : addAirV) * -impulse;
