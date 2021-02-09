@@ -1,3 +1,4 @@
+import Animator from './Animator';
 import * as Logger from './log';
 
 let inputAxis = 0;
@@ -16,6 +17,7 @@ export default class StateMachine {
         this.hero.canDoubleJump = false;
         this.hero.hasJumped = false;
 
+        this.animator = new Animator({ sprite: this.hero, type: 'frog' });
         // State instances get access to the state machine via this.stateMachine.
         for (const state of Object.values(this.possibleStates)) {
             state.stateMachine = this;
@@ -63,16 +65,24 @@ export default class StateMachine {
         Logger.log(newState);
         this.state = newState;
         this.possibleStates[this.state].enter(this.scene, this.hero, ...enterArgs);
+    }   
+}
+
+class State {
+    getAnimation(anim) {
+        return this.stateMachine.animator.getAnimation(anim);
     }
-    
+
+    transitionState(state) {
+        this.stateMachine.transition(state);
+    }
+
     setSpriteGravity(sprite, value) {
         if(sprite.body.gravity.y !== value) {
             sprite.body.setGravityY(value);
         }
     }
-}
 
-class State {
     enter() {
 
     }
@@ -93,7 +103,7 @@ class IdleState extends State {
         hero.hasJumped = false;
         hero.body.setVelocity(0);
         if (!hero.anims.isPlaying) {
-            hero.anims.play('idle');
+            hero.anims.play(this.getAnimation('idle'), true);
         }
         hero.removeAllListeners();
         // Disable hoping action
@@ -114,15 +124,15 @@ class IdleState extends State {
         }
         // Transition to crouch if pressing down
         if (hero.input.crouch()) {
-            this.stateMachine.transition('crouch');
+            this.transitionState('crouch');
         }
 
         if (hero.canJump && hero.input.jump()) {
-            this.stateMachine.transition('jump');
+            this.transitionState('jump');
         }
 
         if (hero.input.moveLeft() || hero.input.moveRight()) {
-            this.stateMachine.transition('move');
+            this.transitionState('move');
         }
     }
 }
@@ -149,11 +159,11 @@ class CrouchState extends State {
         if (!hero.input.crouch() && hero.canStand) {
             hero.anims.stop();
             hero.canStand = false;
-            this.stateMachine.transition('idle');
+            this.transitionState('idle');
         }
 
         if (!hero.body.onFloor()) {
-            this.stateMachine.transition('jump');
+            this.transitionState('jump');
         }
     }
 }
@@ -162,7 +172,7 @@ class MoveState extends State {
     transitionSpriteFromMoving(sprite, state) {
         sprite.anims.stop();
         sprite.anims.timeScale = 1;
-        this.stateMachine.transition(state.toString());
+        this.transitionState(state.toString());
     }
 
     getSpriteVelocityWithAcceleration(hero) {
@@ -198,10 +208,11 @@ class MoveState extends State {
             hero.setFlipX(hero.isFacingLeft);
             hero.body.setVelocityX(_velocity);
             if(this.getIsSpriteBlocked(hero)) {
-                hero.anims.play('idle', true);
+                hero.anims.play(this.getAnimation('idle'), true);
             } else {
                 hero.anims.timeScale = frameRate;
-                hero.anims.play({ key: 'run', startFrame: 5}, true);
+                // hero.anims.play({ key: 'run', startFrame: 5}, true);
+                hero.anims.play(this.getAnimation('run'), true);
             }
         }
 
@@ -212,9 +223,7 @@ class MoveState extends State {
 
         // Transition to idle if not pressing movement keys
         if (!hero.input.moveLeft() && !hero.input.moveRight()) {
-            hero.anims.timeScale = 1;
-            hero.anims.stop();
-            this.stateMachine.transition('idle');
+            this.transitionSpriteFromMoving(hero, 'idle');
         }
 
         if (!hero.canJump && !hero.input.jump()) {
@@ -235,7 +244,7 @@ class SlideState extends State {
     transitionSpriteFromSliding(sprite, targetState){
         sprite.forceSlide = true;
         sprite.anims.stop();
-        this.stateMachine.transition(targetState);
+        this.transitionState(targetState);
     }
 
     enter(scene, hero) {
@@ -274,11 +283,6 @@ class SlideState extends State {
 }
 
 class JumpState extends State {
-    setSpriteGravity(sprite, value) {
-        if(sprite.body.gravity.y !== value) {
-            sprite.body.setGravityY(value);
-        }
-    }
     /**
      *
      * @param {Phaser.Scene} scene
@@ -292,7 +296,7 @@ class JumpState extends State {
             hero.hasJumped = true;
             hero.anims.stop();
             hero.body.setVelocityY(hero.jumpVelocity * hero.jumpForce);
-            hero.anims.play('jump-up', true);
+            hero.anims.play(this.getAnimation('jump-up'), true);
             hero.canJump = false;
         }
     }
@@ -310,14 +314,14 @@ class JumpState extends State {
         if (hero.body.onFloor()) {
             this.setSpriteGravity(hero, 0);
             if (hero.body.velocity.x !== 0 && hero.input.crouch()) {
-                this.stateMachine.transition('slide');
+                this.transitionState('slide');
             } else if (hero.input.moveLeft() || hero.input.moveRight()) {
-                this.stateMachine.transition('move');
+                this.transitionState('move');
             } else if (!hero.hasJumped && !hero.canDoubleJump) {
                 hero.landing = 'hard';
-                this.stateMachine.transition('land');
+                this.transitionState('land');
             } else {
-                this.stateMachine.transition('land');
+                this.transitionState('land');
             }
         } else {
             // In the air
@@ -329,7 +333,7 @@ class JumpState extends State {
             // Execute Double Jump 
             } else if (hero.canDoubleJump && hero.input.jump()) {
                 this.setSpriteGravity(hero, 0);
-                this.stateMachine.transition('doubleJump');
+                this.transitionState('doubleJump');
             }
 
             // Sprite is falling
@@ -345,7 +349,7 @@ class JumpState extends State {
                     hero.canDoubleJump = true;
                 }
 
-                hero.anims.play('jump-down');
+                hero.anims.play(this.getAnimation('jump-down'));
             }
 
             if (hero.input.moveLeft() && hero.input.moveRight()) {
@@ -373,19 +377,19 @@ class DoubleJumpState extends State {
         hero.body.setVelocityY(hero.jumpVelocity * 1.1);
         hero.anims.play('roll');
         hero.once('animationcomplete-roll', () => {
-            this.stateMachine.transition('jump');
+            this.transitionState('jump');
         });
     }
 
     execute(scene, hero) {
         if (hero.input.moveLeft() && hero.body.velocity.x >= 0) {
             hero.setFlipX(true);
-            this.stateMachine.setSpriteGravity(hero, 0);
+            this.setSpriteGravity(hero, 0);
             let _velocity = (hero.body.velocity.x !== 0 ? hero.body.velocity.x : 100) * -0.8;
             hero.body.setVelocityX(_velocity);
         } else if (hero.input.moveRight() && hero.body.velocity.x <= 0) {
             hero.setFlipX(false);
-            this.stateMachine.setSpriteGravity(hero, 0);
+            this.setSpriteGravity(hero, 0);
             let _velocity = (hero.body.velocity.x !== 0 ? hero.body.velocity.x : -100) * -0.8;
             hero.body.setVelocityX(_velocity);
         }
@@ -396,14 +400,12 @@ class DoubleJumpState extends State {
             hero.body.setVelocityY(hero.body.velocity.y * 0.8);
             if (hero.body.velocity.y >= 0) {
                 hero.landing = 'hard';
-                this.stateMachine.transition('jump');
+                this.transitionState('jump');
             }
         }
     }
 }
-/**
- * @todo jump in landing animation
- */
+
 class LandingState extends State {
     /**
      * 
@@ -412,7 +414,7 @@ class LandingState extends State {
      */
     enter(scene, hero) {
         hero.once('animationcomplete-hard-land', anim => {
-            this.stateMachine.transition('idle');
+            this.transitionState('idle');
         });
     }
 
@@ -420,13 +422,13 @@ class LandingState extends State {
         // override landing animation on player input
         if (hero.input.moveLeft() || hero.input.moveRight()) {
             hero.anims.stop();
-            this.stateMachine.transition('move');
+            this.transitionState('move');
         } else if (hero.input.jump() && hero.canJump) {
             hero.anims.stop();
-            this.stateMachine.transition('jump');
+            this.transitionState('jump');
         } else {
             if (hero.landing === 'soft') {
-                this.stateMachine.transition('crouch');
+                this.transitionState('crouch');
             } else {
                 hero.body.setVelocityX(0);
                 hero.anims.play('hard-land', true);

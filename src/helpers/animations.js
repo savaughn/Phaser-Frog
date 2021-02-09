@@ -79,4 +79,55 @@ export default function makeAnimations(scene) {
             start: 0, end: 0
         })
     });
+
+    scene.anims.create({
+        key: 'frog-idle',
+        frameRate: 5,
+        frames: scene.anims.generateFrameNumbers('frog-idle', {
+            start: 0, end: 3
+        }),
+        repeat: -1
+    });
+
+    scene.anims.create({
+        key: 'frog-idle_out',
+        frameRate: 5,
+        frames: scene.anims.generateFrameNumbers('frog-idle_out', {
+            start: 0, end: 3
+        }),
+        repeat: -1
+    });
+
+    scene.anims.create({
+        key: 'frog-walk_out',
+        frameRate: 10,
+        frames: scene.anims.generateFrameNumbers('frog-walk_out', {
+            start: 0, end: 3
+        }),
+        repeat: -1
+    });
+
+    scene.anims.create({
+        key: 'frog-jump_up_out',
+        frameRate: 10,
+        frames: scene.anims.generateFrameNumbers('frog-jump_out', {
+            start: 0, end: 0
+        }),
+    });
+
+    scene.anims.create({
+        key: 'frog-jump_down_out',
+        frameRate: 10,
+        frames: scene.anims.generateFrameNumbers('frog-jump_out', {
+            start: 1, end: 1
+        }),
+    });
+
+    scene.anims.create({
+        key: 'frog-jump',
+        frameRate: 2,
+        frames: scene.anims.generateFrameNumbers('frog-jump_out', {
+            start: 0, end: 1
+        }),
+    });
 }
