@@ -13,6 +13,9 @@ class BootScene extends Phaser.Scene {
         this.hero = null;
         this.animations = ['run', 'idle', 'idle'];
         this.index = 0;
+        this.frog = null;
+        this.frog2 = null;
+        this.frog3 = null;
     }
     preload() {
         // const progress = this.add.graphics();
@@ -60,15 +63,36 @@ class BootScene extends Phaser.Scene {
         this.load.spritesheet('player-slide', 'assets/Lifter Asset Pack/1.Sprite/1.Player/shorthair/Skin1/shortplayer_slider.png', {
             frameWidth: 32, frameHeight: 32
         });
+        this.load.spritesheet('frog-idle', 'assets/Sprite-0001.png', {
+            frameWidth: 32, frameHeight: 32
+        });
+        this.load.spritesheet('frog-idle_out', 'assets/Sprite-0001_idle_outlined.png', {
+            frameWidth: 32, frameHeight: 32
+        });
+        this.load.spritesheet('frog-walk_out', 'assets/Sprite-0001_walk_out.png', {
+            frameWidth: 32, frameHeight: 32
+        });
+        this.load.spritesheet('frog-jump_out', 'assets/Sprite-0001_jump_outlined.png', {
+            frameWidth: 32, frameHeight: 32
+        });
     }
 
     create() {
         this.hero = this.add.sprite(this.sys.game.config.width * .9, this.sys.game.config.height * .75, 'sprite');
         this.hero.setScale(5);
         this.hero.play('idle', true);
+        this.frog = this.add.sprite(this.sys.game.config.width * .2, this.sys.game.config.height * .75, 'frog');
+        this.frog.setScale(5);
+        this.frog2 = this.add.sprite(this.sys.game.config.width * .1, this.sys.game.config.height * .75, 'frog_idle');
+        this.frog2.setScale(5);
+        this.frog3 = this.add.sprite(this.sys.game.config.width * .3, this.sys.game.config.height * .75, 'frog_jump').setScale(5);
+        // this.add.sprite(this.sys.game.config.width * .4, this.sys.game.config.height * .75, 'frog_jump_down').setScale(5).play('frog-jump_down_out');
     }
 
     update(time) {
+        this.frog.play('frog-walk_out', true);
+        this.frog2.play('frog-idle_out', true);
+        this.frog3.play('frog-jump', true);
         if (time % 2000 <= 20) {
             this.index = (this.index + 1) % this.animations.length;
             this.hero.play(this.animations[this.index], true);
