@@ -8,7 +8,7 @@ const initialVelocity = 10;
 const minJumpV = 100;
 
 export default class StateMachine {
-    constructor(initialState, possibleStates, sprite) {
+    constructor(initialState, possibleStates, sprite, type) {
         this.initialState = initialState;
         this.possibleStates = possibleStates;
         this.state = null;
@@ -16,8 +16,10 @@ export default class StateMachine {
         this.scene = sprite.scene;
         this.hero.canDoubleJump = false;
         this.hero.hasJumped = false;
+        this.type = type;
 
-        this.animator = new Animator({ sprite: this.hero, type: 'frog' });
+        this.animator = new Animator({ sprite: this.hero, type: this.type });
+
         // State instances get access to the state machine via this.stateMachine.
         for (const state of Object.values(this.possibleStates)) {
             state.stateMachine = this;

@@ -44,7 +44,8 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.currentState = 'idle';
 
         this.input = new InputMap(this, this.scene);
-        this.stateMachine = StateMachineGenerator(this, 'hero');
+        this.stateMachine = StateMachineGenerator(this, config.key);
+        // this.stateMachine = StateMachineGenerator(this, 'hero');
     }
 
     update(time, delta) {
