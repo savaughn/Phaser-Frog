@@ -142,7 +142,7 @@ class IdleState extends State {
 class CrouchState extends State {
     enter(scene, hero) {
         hero.canStand = false;
-        hero.anims.play('crouch');
+        hero.anims.play(this.getAnimation('crouch'));
         scene.time.delayedCall(100, () => {
             hero.canStand = true;
         });
@@ -439,6 +439,11 @@ class LandingState extends State {
     }
 }
 
+class CrawlState extends State {
+    enter() {}
+    execute() {}
+}
+
 export {
-    CrouchState, IdleState, MoveState, JumpState, DoubleJumpState, SlideState, LandingState
+    CrouchState, IdleState, MoveState, JumpState, DoubleJumpState, SlideState, LandingState, CrawlState
 };

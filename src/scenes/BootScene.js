@@ -75,6 +75,9 @@ class BootScene extends Phaser.Scene {
         this.load.spritesheet('frog-jump_out', 'assets/Sprite-0001_jump_outlined.png', {
             frameWidth: 32, frameHeight: 32
         });
+        this.load.spritesheet('frog-crouch_out', 'assets/Sprite-0001_crouch_outlined.png', {
+            frameWidth: 32, frameHeight: 32
+        });
     }
 
     create() {
@@ -86,7 +89,7 @@ class BootScene extends Phaser.Scene {
         this.frog2 = this.add.sprite(this.sys.game.config.width * .1, this.sys.game.config.height * .75, 'frog_idle');
         this.frog2.setScale(5);
         this.frog3 = this.add.sprite(this.sys.game.config.width * .3, this.sys.game.config.height * .75, 'frog_jump').setScale(5);
-        // this.add.sprite(this.sys.game.config.width * .4, this.sys.game.config.height * .75, 'frog_jump_down').setScale(5).play('frog-jump_down_out');
+        this.add.sprite(this.sys.game.config.width * .4, this.sys.game.config.height * .75, 'frog_crouch').setScale(5).play('frog-crouch_out');
     }
 
     update(time) {

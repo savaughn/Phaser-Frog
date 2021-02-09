@@ -130,4 +130,12 @@ export default function makeAnimations(scene) {
             start: 0, end: 1
         }),
     });
+
+    scene.anims.create({
+        key: 'frog-crouch_out',
+        frameRate: 10,
+        frames: scene.anims.generateFrameNumbers('frog-crouch_out', {
+            start: 0, end: 0
+        }),
+    });
 }

@@ -41,6 +41,13 @@ export default class Animator {
                     return 'jump-down';
                 }
             }
+            case 'crouch': {
+                if (this.type === 'frog') {
+                    return 'frog-crouch_out';
+                } else {
+                    return 'crouch';
+                }
+            }
         }
     }
 
