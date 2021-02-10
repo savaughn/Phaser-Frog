@@ -67,16 +67,16 @@ class BootScene extends Phaser.Scene {
         this.load.spritesheet('frog-idle', 'assets/Sprite-0001.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-idle_out', 'assets/Sprite-0001_idle_outlined.png', {
+        this.load.spritesheet('frog-idle_out', 'assets/frog-idle.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-walk_out', 'assets/Sprite-0001_walk1_out.png', {
+        this.load.spritesheet('frog-walk_out', 'assets/frog-run.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-jump_out', 'assets/Sprite-0001_jump_outlined.png', {
+        this.load.spritesheet('frog-jump_out', 'assets/frog-jump.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-crouch_out', 'assets/Sprite-0001_crouch_outlined.png', {
+        this.load.spritesheet('frog-crouch_out', 'assets/frog-crouched.png', {
             frameWidth: 32, frameHeight: 32
         });
         this.load.spritesheet('frog-look_out', 'assets/Sprite-0001_eyes.png', {
