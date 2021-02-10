@@ -10,16 +10,6 @@ class GameScene extends Phaser.Scene {
 
     create() {
         buildScene(this);
-        this.hero = new Hero({
-            scene: this,
-            key: 'frog',
-            x: 1100,
-            y: 800,
-            enablePhysics: true
-        },
-        this.input.gamepad?.getPad(0)
-        );
-
         this.frog = null;
 
         if (this.input.gamepad?.pad2) {
@@ -35,6 +25,16 @@ class GameScene extends Phaser.Scene {
             this.physics.add.collider(this.frog, this.platforms);
             console.log(this.frog.setTint(0xef7564));
         }
+
+        this.hero = new Hero({
+            scene: this,
+            key: 'frog',
+            x: 1100,
+            y: 800,
+            enablePhysics: true
+        },
+        this.input.gamepad?.getPad(0)
+        );
 
         this.physics.add.collider(this.hero, this.platforms);
         this.cameras.main.setZoom(4);
