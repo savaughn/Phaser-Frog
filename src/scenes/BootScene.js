@@ -16,6 +16,7 @@ class BootScene extends Phaser.Scene {
         this.frog = null;
         this.frog2 = null;
         this.frog3 = null;
+        this.frog4 = null;
     }
     preload() {
         // const progress = this.add.graphics();
@@ -78,6 +79,9 @@ class BootScene extends Phaser.Scene {
         this.load.spritesheet('frog-crouch_out', 'assets/Sprite-0001_crouch_outlined.png', {
             frameWidth: 32, frameHeight: 32
         });
+        this.load.spritesheet('frog-look_out', 'assets/Sprite-0001_eyes.png', {
+            frameWidth: 32, frameHeight: 32
+        });
     }
 
     create() {
@@ -88,22 +92,25 @@ class BootScene extends Phaser.Scene {
         this.frog.setScale(5);
         this.frog2 = this.add.sprite(this.sys.game.config.width * .1, this.sys.game.config.height * .75, 'frog_idle');
         this.frog2.setScale(5);
-        // this.frog3 = this.add.sprite(this.sys.game.config.width * .3, this.sys.game.config.height * .75, 'frog_jump').setScale(5);
         this.add.sprite(this.sys.game.config.width * .3, this.sys.game.config.height * .75, 'frog_jump_up').setScale(5).play('frog-jump_up_out');
         this.add.sprite(this.sys.game.config.width * .4, this.sys.game.config.height * .75, 'frog_jump_down').setScale(5).play('frog-jump_down_out');
         this.add.sprite(this.sys.game.config.width * .5, this.sys.game.config.height * .75, 'frog_crouch').setScale(5).play('frog-crouch_out');
+        this.frog3 = this.add.sprite(this.sys.game.config.width * .6, this.sys.game.config.height * .75, 'frog_look').setScale(5);
+        this.frog3.play('frog-look');
     }
 
     update(time) {
         this.frog.play('frog-walk_out', true);
         this.frog2.play('frog-idle_out', true);
-        // this.frog3.play('frog-jump', true);
+        
         if (time % 2000 <= 20) {
             this.index = (this.index + 1) % this.animations.length;
             this.hero.play(this.animations[this.index], true);
             if (this.index === this.animations.length - 1) {
                 this.hero.setFlipX(!this.hero.flipX);
             }
+
+            this.frog3.play(['frog-blink', 'frog-look'][Math.round(Math.random())]);
         }
     }
 }

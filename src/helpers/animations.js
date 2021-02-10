@@ -138,4 +138,20 @@ export default function makeAnimations(scene) {
             start: 0, end: 0
         }),
     });
+
+    scene.anims.create({
+        key: 'frog-look',
+        frameRate: 5,
+        frames: scene.anims.generateFrameNumbers('frog-look_out', {
+            start: 0, end: 3
+        }),
+    });
+
+    scene.anims.create({
+        key: 'frog-blink',
+        frameRate: 15,
+        frames: scene.anims.generateFrameNumbers('frog-look_out', {
+            start: 4, end: 8
+        }),
+    });
 }
