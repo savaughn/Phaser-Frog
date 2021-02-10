@@ -2,7 +2,7 @@ import Animator from './Animator';
 import * as Logger from './log';
 
 let inputAxis = 0;
-let accel = 0.1;
+let accel = 0.15;
 const targetSpeed = 175;
 const initialVelocity = 10;
 const minJumpV = 100;
@@ -252,7 +252,7 @@ class SlideState extends State {
     enter(scene, hero) {
         hero.forceSlide = true;
         hero.anims.stop();
-        hero.anims.play('slide', false);
+        hero.anims.play(this.getAnimation('slide'));
         hero.forceTimer = scene.time.addEvent({
             delay: 300,
             callback: () => {
@@ -342,11 +342,11 @@ class JumpState extends State {
             if (hero.body.velocity.y > 0) {
                 hero.landing = 'soft';
                 //          regular jump                                double jump
-                if (hero.anims.currentAnim?.key === 'jump-up' || hero.anims.currentAnim?.key === 'roll') {
+                if (hero.anims.currentAnim?.key === this.getAnimation('jump-up') || hero.anims.currentAnim?.key === 'roll') {
                     this.setSpriteGravity(hero, 750);
                 }
 
-                if (hero.anims.currentAnim?.key === 'idle' || hero.anims.currentAnim?.key === 'run' || hero.anims.currentAnim?.key === 'slide') {
+                if (hero.anims.currentAnim?.key === this.getAnimation('idle') || hero.anims.currentAnim?.key === this.getAnimation('run') || hero.anims.currentAnim?.key === 'slide') {
                     hero.anims.stop();
                     hero.canDoubleJump = true;
                 }
@@ -377,8 +377,8 @@ class DoubleJumpState extends State {
         hero.hasJumped = false;
         hero.canJump = false;
         hero.body.setVelocityY(hero.jumpVelocity * 1.1);
-        hero.anims.play('roll');
-        hero.once('animationcomplete-roll', () => {
+        hero.anims.play(this.getAnimation('roll'));
+        hero.once(`animationcomplete-${ this.getAnimation('roll') }`, () => {
             this.transitionState('jump');
         });
     }
@@ -415,7 +415,7 @@ class LandingState extends State {
      * @param {Phaser.GameObjects.Sprite} hero 
      */
     enter(scene, hero) {
-        hero.once('animationcomplete-hard-land', anim => {
+        hero.once(`animationcomplete-${ this.getAnimation('hard-land') }`, anim => {
             this.transitionState('idle');
         });
     }
@@ -433,7 +433,7 @@ class LandingState extends State {
                 this.transitionState('crouch');
             } else {
                 hero.body.setVelocityX(0);
-                hero.anims.play('hard-land', true);
+                hero.anims.play(this.getAnimation('hard-land'), true);
             }
         }
     }
