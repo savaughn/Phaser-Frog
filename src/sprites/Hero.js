@@ -9,7 +9,7 @@ import StateMachineGenerator from '../helpers/StateMachineGenerator';
 
 export default class Hero extends Phaser.GameObjects.Sprite {
     constructor(config, myGamepad) {
-        super(config.scene, config.x, config.y, config.key, config.enablePhysics);
+        super(config.scene, config.x, config.y);
         if (config.enablePhysics) {
             config.scene.physics.world.enable(this);
             config.scene.add.existing(this);
