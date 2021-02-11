@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import Animator from './Animator';
 import * as Logger from './log';
+import SpriteSpawner from './SpriteSpawner';
 
 let inputAxis = 0;
 let accel = 0.15;
@@ -84,6 +85,10 @@ class State {
         if(sprite.body.gravity.y !== value) {
             sprite.body.setGravityY(value);
         }
+    }
+
+    spawnSpriteEffect(animation) {
+        new SpriteSpawner({ scene: this.stateMachine.scene, hero: this.stateMachine.hero, animation }).play(animation, true);
     }
 
     enter() {
@@ -214,7 +219,6 @@ class MoveState extends State {
                 hero.anims.play(this.getAnimation('idle'), true);
             } else {
                 hero.anims.timeScale = frameRate;
-                // hero.anims.play({ key: 'run', startFrame: 5}, true);
                 hero.anims.play(this.getAnimation('run'), true);
             }
         }
@@ -222,6 +226,10 @@ class MoveState extends State {
         // Execute slide
         if (hero.input.crouch() && hero.canSlide) {
             this.transitionSpriteFromMoving(hero, 'slide');
+        }
+
+        if ((hero.input.moveLeft() && hero.body.velocity.x > 0) || (hero.input.moveRight() && hero.body.velocity.x < 0)) {
+            this.spawnSpriteEffect('frog-land-dust');
         }
 
         // Transition to idle if not pressing movement keys
@@ -301,6 +309,7 @@ class JumpState extends State {
             hero.body.setVelocityY(hero.jumpVelocity * hero.jumpForce);
             hero.anims.play(this.getAnimation('jump-up'), true);
             hero.canJump = false;
+            this.spawnSpriteEffect('frog-land-dust');
         }
     }
 
@@ -318,8 +327,8 @@ class JumpState extends State {
             this.setSpriteGravity(hero, 0);
             if (hero.body.velocity.x !== 0 && hero.input.crouch()) {
                 this.transitionState('slide');
-            } else if (hero.input.moveLeft() || hero.input.moveRight()) {
-                this.transitionState('move');
+            // } else if (hero.input.moveLeft() || hero.input.moveRight()) {
+            //     this.transitionState('move');
             } else if (!hero.hasJumped && !hero.canDoubleJump) {
                 hero.landing = 'hard';
                 this.transitionState('land');
@@ -374,6 +383,7 @@ class JumpState extends State {
 
 class DoubleJumpState extends State {
     enter(scene, hero) {
+        this.spawnSpriteEffect('frog-land-dust');
         hero.canDoubleJump = false;
         hero.hasJumped = false;
         hero.canJump = false;
@@ -412,21 +422,14 @@ class DoubleJumpState extends State {
 class LandingState extends State {
     /**
      * 
-     * @param {*} scene 
+     * @param { Phaser.Scene } scene 
      * @param {Phaser.GameObjects.Sprite} hero 
      */
     enter(scene, hero) {
         hero.once(`animationcomplete-${ this.getAnimation('hard-land') }`, anim => {
             this.transitionState('idle');
         });
-
-        // this.dust = scene.add.sprite(hero.x, hero.y + 5, 'dust');
-
-        // this.dust.once('animationcomplete-frog-land-dust', () => {
-        //     this.dust.destroy();
-        // });
-
-        // console.log(scene.anims);
+        this.spawnSpriteEffect('frog-land-dust');
     }
 
     execute(scene, hero) {
@@ -438,7 +441,6 @@ class LandingState extends State {
             hero.anims.stop();
             this.transitionState('jump');
         } else {
-            // this.dust.play('frog-land-dust', true);
             if (hero.landing === 'soft') {
                 this.transitionState('crouch');
             } else {
