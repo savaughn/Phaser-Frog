@@ -28,63 +28,63 @@ export default class Animator {
         switch (animation) {
             case this.animations.idle: {
                 if(this.type === 'frog') {
-                    return 'frog-idle_out';
+                    return 'frog-idle';
                 } else {
                     return 'idle'
                 }
             }
             case 'walk': {
                 if (this.type === 'frog') {
-                    return 'frog-walk_out';
+                    return 'frog-run';
                 } else {
                     return 'run';
                 }
             }
             case 'run': {
                 if (this.type === 'frog') {
-                    return 'frog-walk_out';
+                    return 'frog-run';
                 } else {
                     return 'run';
                 }
             }
             case 'jump-up': {
                 if (this.type === 'frog') {
-                    return 'frog-jump_up_out';
+                    return 'frog-jump_up';
                 } else {
                     return 'jump-up';
                 }
             }
             case 'jump-down': {
                 if (this.type === 'frog') {
-                    return 'frog-jump_down_out';
+                    return 'frog-jump_down';
                 } else {
                     return 'jump-down';
                 }
             }
             case 'crouch': {
                 if (this.type === 'frog') {
-                    return 'frog-crouch_out';
+                    return 'frog-crouch';
                 } else {
                     return 'crouch';
                 }
             }
             case 'roll': {
                 if (this.type === 'frog') {
-                    return 'frog-jump_up_out';
+                    return 'frog-jump_up';
                 } else {
                     return 'roll';
                 }
             }
             case 'hard-land': {
                 if (this.type === 'frog') {
-                    return 'frog-crouch_out';
+                    return 'frog-crouch';
                 } else {
                     return 'hard-land';
                 }
             }
             case 'slide': {
                 if (this.type === 'frog') {
-                    return 'frog-crouch_out';
+                    return 'frog-crouch';
                 } else {
                     return 'slide';
                 }
@@ -93,7 +93,7 @@ export default class Animator {
                 this.errorHandle(animation);
                 // console.error(`missing animation: ${ animation }`);
                 if(this.type === 'frog') {
-                    return 'frog-idle_out';
+                    return 'frog-idle';
                 } else {
                     return 'idle'
                 }

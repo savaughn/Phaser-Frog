@@ -90,35 +90,26 @@ export default function makeAnimations(scene) {
     });
 
     scene.anims.create({
-        key: 'frog-idle_out',
-        frameRate: 5,
-        frames: scene.anims.generateFrameNumbers('frog-idle_out', {
+        key: 'frog-run',
+        frameRate: 10,
+        frames: scene.anims.generateFrameNumbers('frog-run', {
             start: 0, end: 3
         }),
         repeat: -1
     });
 
     scene.anims.create({
-        key: 'frog-walk_out',
+        key: 'frog-jump_up',
         frameRate: 10,
-        frames: scene.anims.generateFrameNumbers('frog-walk_out', {
-            start: 0, end: 3
-        }),
-        repeat: -1
-    });
-
-    scene.anims.create({
-        key: 'frog-jump_up_out',
-        frameRate: 10,
-        frames: scene.anims.generateFrameNumbers('frog-jump_out', {
+        frames: scene.anims.generateFrameNumbers('frog-jump', {
             start: 0, end: 0
         }),
     });
 
     scene.anims.create({
-        key: 'frog-jump_down_out',
+        key: 'frog-jump_down',
         frameRate: 10,
-        frames: scene.anims.generateFrameNumbers('frog-jump_out', {
+        frames: scene.anims.generateFrameNumbers('frog-jump', {
             start: 1, end: 1
         }),
     });
@@ -126,15 +117,15 @@ export default function makeAnimations(scene) {
     scene.anims.create({
         key: 'frog-jump',
         frameRate: 2,
-        frames: scene.anims.generateFrameNumbers('frog-jump_out', {
+        frames: scene.anims.generateFrameNumbers('frog-jump', {
             start: 0, end: 1
         }),
     });
 
     scene.anims.create({
-        key: 'frog-crouch_out',
+        key: 'frog-crouch',
         frameRate: 10,
-        frames: scene.anims.generateFrameNumbers('frog-crouch_out', {
+        frames: scene.anims.generateFrameNumbers('frog-crouch', {
             start: 0, end: 0
         }),
     });
@@ -142,7 +133,7 @@ export default function makeAnimations(scene) {
     scene.anims.create({
         key: 'frog-look',
         frameRate: 5,
-        frames: scene.anims.generateFrameNumbers('frog-look_out', {
+        frames: scene.anims.generateFrameNumbers('frog-look', {
             start: 0, end: 3
         }),
     });
@@ -150,8 +141,16 @@ export default function makeAnimations(scene) {
     scene.anims.create({
         key: 'frog-blink',
         frameRate: 15,
-        frames: scene.anims.generateFrameNumbers('frog-look_out', {
+        frames: scene.anims.generateFrameNumbers('frog-look', {
             start: 4, end: 8
+        }),
+    });
+
+    scene.anims.create({
+        key: 'frog-land-dust',
+        frameRate: 20,
+        frames: scene.anims.generateFrameNumbers('frog-land-dust', {
+            start: 0, end: 3
         }),
     });
 }

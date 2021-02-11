@@ -1,3 +1,4 @@
+import { Scene } from 'phaser';
 import Animator from './Animator';
 import * as Logger from './log';
 
@@ -418,6 +419,14 @@ class LandingState extends State {
         hero.once(`animationcomplete-${ this.getAnimation('hard-land') }`, anim => {
             this.transitionState('idle');
         });
+
+        // this.dust = scene.add.sprite(hero.x, hero.y + 5, 'dust');
+
+        // this.dust.once('animationcomplete-frog-land-dust', () => {
+        //     this.dust.destroy();
+        // });
+
+        // console.log(scene.anims);
     }
 
     execute(scene, hero) {
@@ -429,6 +438,7 @@ class LandingState extends State {
             hero.anims.stop();
             this.transitionState('jump');
         } else {
+            // this.dust.play('frog-land-dust', true);
             if (hero.landing === 'soft') {
                 this.transitionState('crouch');
             } else {

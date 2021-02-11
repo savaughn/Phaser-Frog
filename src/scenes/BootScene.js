@@ -6,7 +6,7 @@ import Hero from '../sprites/Hero';
  */
 
 class BootScene extends Phaser.Scene {
-    constructor(config) {
+    constructor() {
         super({
             key: 'BootScene'
         });
@@ -19,24 +19,24 @@ class BootScene extends Phaser.Scene {
         this.frog4 = null;
     }
     preload() {
-        // const progress = this.add.graphics();
-
-        // // Register a load progress event to show a load bar
-        // this.load.on('progress', (value) => {
-        //     progress.clear();
-        //     progress.fillStyle(0xffffff, 1);
-        //     progress.fillRect(0, this.sys.game.config.height / 2, this.sys.game.config.width * value, 60);
-        // });
-
+        let loading = this.add.text(this.sys.game.config.width * 0.4,
+            this.sys.game.config.height * 0.25,
+            'Loading',
+            {
+                fontSize: 64, fill: '#FFFFFF'
+            }
+        );
         // Register a load complete event to launch the title screen when all files are loaded
         this.load.on('complete', () => {
-            this.add.text(this.sys.game.config.width *0.1, 
-                this.sys.game.config.height / 2, 
-                'Press any key or button on gamepad', 
-                { fontSize: 64, fill: '#FFFFFF' }
+            loading.destroy();
+            this.add.text(this.sys.game.config.width * 0.1,
+                this.sys.game.config.height / 2,
+                'Press any key or button on gamepad',
+                {
+                    fontSize: 64, fill: '#FFFFFF'
+                }
             );
             makeAnimations(this);
-            // progress.destroy();
             this.input.gamepad.once('connected', () => {
                 this.scene.start('GameScene');
             });
@@ -64,44 +64,44 @@ class BootScene extends Phaser.Scene {
         this.load.spritesheet('player-slide', 'assets/Lifter Asset Pack/1.Sprite/1.Player/shorthair/Skin1/shortplayer_slider.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-idle', 'assets/Sprite-0001.png', {
+        this.load.spritesheet('frog-idle', 'assets/frog-idle.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-idle_out', 'assets/frog-idle.png', {
+        this.load.spritesheet('frog-run', 'assets/frog-run.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-walk_out', 'assets/frog-run.png', {
+        this.load.spritesheet('frog-jump', 'assets/frog-jump.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-jump_out', 'assets/frog-jump.png', {
+        this.load.spritesheet('frog-crouch', 'assets/frog-crouched.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-crouch_out', 'assets/frog-crouched.png', {
+        this.load.spritesheet('frog-look', 'assets/Sprite-0001_eyes.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-look_out', 'assets/Sprite-0001_eyes.png', {
-            frameWidth: 32, frameHeight: 32
+        this.load.spritesheet('frog-land-dust', 'assets/frog-land-dust.png', {
+            frameWidth: 50, frameHeight: 20
         });
     }
 
     create() {
-        this.hero = this.add.sprite(this.sys.game.config.width * .9, this.sys.game.config.height * .75, 'sprite');
+        this.hero = this.add.sprite(this.sys.game.config.width * 0.9, this.sys.game.config.height * 0.75, 'sprite');
         this.hero.setScale(5);
         this.hero.play('idle', true);
-        this.frog = this.add.sprite(this.sys.game.config.width * .2, this.sys.game.config.height * .75, 'frog');
+        this.frog = this.add.sprite(this.sys.game.config.width * 0.2, this.sys.game.config.height * 0.75, 'frog');
         this.frog.setScale(5);
-        this.frog2 = this.add.sprite(this.sys.game.config.width * .1, this.sys.game.config.height * .75, 'frog_idle');
+        this.frog2 = this.add.sprite(this.sys.game.config.width * 0.1, this.sys.game.config.height * 0.75, 'frog_idle');
         this.frog2.setScale(5);
-        this.add.sprite(this.sys.game.config.width * .3, this.sys.game.config.height * .75, 'frog_jump_up').setScale(5).play('frog-jump_up_out');
-        this.add.sprite(this.sys.game.config.width * .4, this.sys.game.config.height * .75, 'frog_jump_down').setScale(5).play('frog-jump_down_out');
-        this.add.sprite(this.sys.game.config.width * .5, this.sys.game.config.height * .75, 'frog_crouch').setScale(5).play('frog-crouch_out');
-        this.frog3 = this.add.sprite(this.sys.game.config.width * .6, this.sys.game.config.height * .75, 'frog_look').setScale(5);
+        this.add.sprite(this.sys.game.config.width * 0.3, this.sys.game.config.height * 0.75, 'frog_jump_up').setScale(5).play('frog-jump_up');
+        this.add.sprite(this.sys.game.config.width * 0.4, this.sys.game.config.height * 0.75, 'frog_jump_down').setScale(5).play('frog-jump_down');
+        this.add.sprite(this.sys.game.config.width * 0.5, this.sys.game.config.height * 0.75, 'frog_crouch').setScale(5).play('frog-crouch');
+        this.frog3 = this.add.sprite(this.sys.game.config.width * 0.6, this.sys.game.config.height * 0.75, 'frog_look').setScale(5);
         this.frog3.play('frog-look');
     }
 
     update(time) {
-        this.frog.play('frog-walk_out', true);
-        this.frog2.play('frog-idle_out', true);
+        this.frog.play('frog-run', true);
+        this.frog2.play('frog-idle', true);
         
         if (time % 2000 <= 20) {
             this.index = (this.index + 1) % this.animations.length;
