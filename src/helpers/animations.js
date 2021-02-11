@@ -103,7 +103,7 @@ export default function makeAnimations(scene) {
         frameRate: 10,
         frames: scene.anims.generateFrameNumbers('frog-jump', {
             start: 0, end: 0
-        }),
+        })
     });
 
     scene.anims.create({
@@ -111,7 +111,7 @@ export default function makeAnimations(scene) {
         frameRate: 10,
         frames: scene.anims.generateFrameNumbers('frog-jump', {
             start: 1, end: 1
-        }),
+        })
     });
 
     scene.anims.create({
@@ -119,7 +119,7 @@ export default function makeAnimations(scene) {
         frameRate: 2,
         frames: scene.anims.generateFrameNumbers('frog-jump', {
             start: 0, end: 1
-        }),
+        })
     });
 
     scene.anims.create({
@@ -127,7 +127,7 @@ export default function makeAnimations(scene) {
         frameRate: 10,
         frames: scene.anims.generateFrameNumbers('frog-crouch', {
             start: 0, end: 0
-        }),
+        })
     });
 
     scene.anims.create({
@@ -135,7 +135,7 @@ export default function makeAnimations(scene) {
         frameRate: 5,
         frames: scene.anims.generateFrameNumbers('frog-look', {
             start: 0, end: 3
-        }),
+        })
     });
 
     scene.anims.create({
@@ -143,7 +143,7 @@ export default function makeAnimations(scene) {
         frameRate: 15,
         frames: scene.anims.generateFrameNumbers('frog-look', {
             start: 4, end: 8
-        }),
+        })
     });
 
     scene.anims.create({
@@ -151,6 +151,6 @@ export default function makeAnimations(scene) {
         frameRate: 20,
         frames: scene.anims.generateFrameNumbers('frog-land-dust', {
             start: 0, end: 3
-        }),
+        })
     });
 }

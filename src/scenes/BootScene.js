@@ -64,22 +64,22 @@ class BootScene extends Phaser.Scene {
         this.load.spritesheet('player-slide', 'assets/Lifter Asset Pack/1.Sprite/1.Player/shorthair/Skin1/shortplayer_slider.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-idle', 'assets/frog-idle.png', {
+        this.load.spritesheet('frog-idle', 'assets/frog/frog-idle.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-run', 'assets/frog-run.png', {
+        this.load.spritesheet('frog-run', 'assets/frog/frog-run.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-jump', 'assets/frog-jump.png', {
+        this.load.spritesheet('frog-jump', 'assets/frog/frog-jump-UD.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-crouch', 'assets/frog-crouched.png', {
+        this.load.spritesheet('frog-crouch', 'assets/frog/frog-crouched.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-look', 'assets/frog-look.png', {
+        this.load.spritesheet('frog-look', 'assets/frog/frog-look.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-land-dust', 'assets/frog-land-dust.png', {
+        this.load.spritesheet('frog-land-dust', 'assets/frog/frog-land-dust.png', {
             frameWidth: 50, frameHeight: 20
         });
     }
