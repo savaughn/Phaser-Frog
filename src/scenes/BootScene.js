@@ -76,7 +76,7 @@ class BootScene extends Phaser.Scene {
         this.load.spritesheet('frog-crouch', 'assets/frog-crouched.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('frog-look', 'assets/Sprite-0001_eyes.png', {
+        this.load.spritesheet('frog-look', 'assets/frog-look.png', {
             frameWidth: 32, frameHeight: 32
         });
         this.load.spritesheet('frog-land-dust', 'assets/frog-land-dust.png', {
