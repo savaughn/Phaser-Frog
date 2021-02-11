@@ -85,9 +85,6 @@ class BootScene extends Phaser.Scene {
     }
 
     create() {
-        this.hero = this.add.sprite(this.sys.game.config.width * 0.9, this.sys.game.config.height * 0.75, 'sprite');
-        this.hero.setScale(5);
-        this.hero.play('idle', true);
         this.frog = this.add.sprite(this.sys.game.config.width * 0.2, this.sys.game.config.height * 0.75, 'frog');
         this.frog.setScale(5);
         this.frog2 = this.add.sprite(this.sys.game.config.width * 0.1, this.sys.game.config.height * 0.75, 'frog_idle');
@@ -104,11 +101,11 @@ class BootScene extends Phaser.Scene {
         this.frog2.play('frog-idle', true);
         
         if (time % 2000 <= 20) {
-            this.index = (this.index + 1) % this.animations.length;
-            this.hero.play(this.animations[this.index], true);
-            if (this.index === this.animations.length - 1) {
-                this.hero.setFlipX(!this.hero.flipX);
-            }
+            // this.index = (this.index + 1) % this.animations.length;
+            // this.hero.play(this.animations[this.index], true);
+            // if (this.index === this.animations.length - 1) {
+            //     this.hero.setFlipX(!this.hero.flipX);
+            // }
 
             this.frog3.play(['frog-blink', 'frog-look'][Math.round(Math.random())]);
         }
